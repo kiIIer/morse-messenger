@@ -23,7 +23,7 @@ impl Messenger for MorserService {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let address = "[::1]:8080".parse().unwrap();
+    let address = "[::1]:50051".parse().unwrap();
     let morser_service = MorserService::default();
 
     Server::builder()
