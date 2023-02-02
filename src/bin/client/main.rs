@@ -1,5 +1,5 @@
-use morser::say_hi;
+use morse_messenger as morser;
 
 fn main() {
-    say_hi("client")
+    morser::say_hi("client")
 }
