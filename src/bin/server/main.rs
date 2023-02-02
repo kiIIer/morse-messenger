@@ -2,7 +2,9 @@ use morser::{
     messenger_server::{Messenger, MessengerServer},
     Signal,
 };
-use tonic::{transport::Server, Request, Response, Status};
+use tokio::sync::mpsc;
+use tokio_stream::wrappers::ReceiverStream;
+use tonic::{transport::Server, Request, Response, Status, Streaming};
 
 pub mod morser {
     tonic::include_proto!("morser");
@@ -13,11 +15,26 @@ pub struct MorserService {}
 
 #[tonic::async_trait]
 impl Messenger for MorserService {
-    async fn chat(&self, request: Request<Signal>) -> Result<Response<Signal>, Status> {
-        let r = request.into_inner();
-        let state = r.state;
-        println!("{}", state);
-        Ok(Response::new(morser::Signal { state }))
+    type ChatStream = ReceiverStream<Result<Signal, Status>>;
+
+    async fn chat(
+        &self,
+        request: Request<Streaming<Signal>>,
+    ) -> Result<Response<Self::ChatStream>, Status> {
+        let mut in_stream = request.into_inner();
+
+        let (tx, rx) = mpsc::channel(5);
+
+        tokio::spawn(async move {
+            while let Some(sig) = in_stream.message().await.unwrap() {
+                println!("Got {}", sig.state);
+                tx.send(Ok(sig))
+                    .await
+                    .expect("The sending to client failed");
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
     }
 }
 
