@@ -1,2 +1,10 @@
 syntax = "proto3";
 package morser;
+
+service Messenger{
+  rpc Chat(stream Signal) returns (stream Signal){}
+}
+
+message Signal {
+  bool state = 1;
+}
