@@ -2,7 +2,7 @@ syntax = "proto3";
 package morser;
 
 service Messenger{
-  rpc Chat(stream Signal) returns (stream Signal){}
+  rpc Chat(Signal) returns (Signal){}
 }
 
 message Signal {
