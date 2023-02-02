@@ -23,7 +23,7 @@ impl Messenger for MorserService {
     ) -> Result<Response<Self::ChatStream>, Status> {
         let mut in_stream = request.into_inner();
 
-        let (tx, rx) = mpsc::channel(5);
+        let (tx, rx) = mpsc::channel(1);
 
         tokio::spawn(async move {
             while let Some(sig) = in_stream.message().await.unwrap() {
