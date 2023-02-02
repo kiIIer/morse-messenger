@@ -1,3 +1,5 @@
+use morser::say_hi;
+
 fn main() {
-    println!("I am server")
+    say_hi("server");
 }

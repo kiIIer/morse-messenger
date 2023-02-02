@@ -7,6 +7,10 @@ edition = "2021"
 
 [dependencies]
 
+[lib]
+name = "morser"
+path = "src/lib/lib.rs"
+
 [[bin]]
 name = "client"
 
