@@ -1,0 +1,10 @@
+syntax = "proto3";
+package morser;
+
+service Messenger{
+  rpc Chat(Signal) returns (Signal){}
+}
+
+message Signal {
+  bool state = 1;
+}
