@@ -62,28 +62,22 @@ impl messenger_server::Messenger for MessengerServer {
         let tx = self.tx.clone();
         let rx = tx.subscribe();
         tokio::spawn(async move {
-            loop {
-                tokio::select! {
-                                read = in_stream.next() => {
-                                    if let Some(result) = read{
-                                        match result{
-                                            Ok(v) => {
-                                                tx.send(Ok(v)).expect("Couldn't send");
-                                            },
-                                            Err(err) => {
-                                                if let Some(io_err) = match_for_io_error(&err){
-                                                    eprintln!("{:?}", io_err);
-                                                    eprintln!("\tclient disconnected: broken pipe");
-                                                }
+            while let Some(result) = in_stream.next().await {
+                match result {
+                    Ok(v) => {
+                        tx.send(Ok(v)).expect("Couldn't send");
+                    }
+                    Err(err) => {
+                        if let Some(io_err) = match_for_io_error(&err) {
+                            eprintln!("{:?}", io_err);
+                            eprintln!("\tclient disconnected: broken pipe");
+                        }
 
-                                                match tx.send(Err(err)){
-                                                    Ok(_) => (),
-                                                    Err(_) => break,
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                        match tx.send(Err(err)) {
+                            Ok(_) => (),
+                            Err(_) => break,
+                        }
+                    }
                 }
             }
             println!("\tstream ended");
