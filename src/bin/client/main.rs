@@ -1,12 +1,8 @@
-use morser::messenger_client::MessengerClient;
-use morser::Signal;
+use morse_messenger::morser::messenger_client::MessengerClient;
+use morse_messenger::morser::Signal;
 use tokio::io;
 use tokio::io::AsyncBufReadExt;
 use tokio_stream::{wrappers, StreamExt};
-
-pub mod morser {
-    tonic::include_proto!("morser");
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

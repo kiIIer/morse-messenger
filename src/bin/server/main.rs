@@ -1,5 +1,6 @@
-use crate::morser::Signal;
 use futures_core::Stream;
+use morse_messenger::morser;
+use morse_messenger::morser::Signal;
 use morser::messenger_server;
 use std::error::Error;
 use std::net::ToSocketAddrs;
@@ -11,10 +12,6 @@ use tonic::{Request, Response, Status, Streaming};
 
 type Message = Result<Signal, Status>;
 
-pub mod morser {
-    tonic::include_proto!("morser");
-}
-
 fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
     let mut err: &(dyn Error + 'static) = err_status;
 
@@ -23,8 +20,6 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
             return Some(io_err);
         }
 
-        // h2::Error do not expose std::io::Error with `source()`
-        // https://github.com/hyperium/h2/pull/462
         if let Some(h2_err) = err.downcast_ref::<h2::Error>() {
             if let Some(io_err) = h2_err.get_io() {
                 return Some(io_err);
