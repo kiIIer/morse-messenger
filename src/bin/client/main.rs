@@ -1,6 +1,7 @@
 use morser::messenger_client::MessengerClient;
 use morser::Signal;
-use std::io::stdin;
+use tokio::io;
+use tokio::io::AsyncBufReadExt;
 use tokio_stream::{wrappers, StreamExt};
 
 pub mod morser {
@@ -21,21 +22,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut in_stream = response.into_inner();
 
-    tokio::spawn(async move {
+    let writer = tokio::spawn(async move {
         while let Some(result) = in_stream.next().await {
             let signal = result.expect("Got an error from server");
             println!("\treceived message: `{}`", signal.state);
         }
     });
 
-    let mut input = String::new();
+    let reader = tokio::spawn(async move {
+        loop {
+            let stdin = io::stdin();
 
-    loop {
-        stdin().read_line(&mut input).expect("Couldn't read line");
+            let mut reader = io::BufReader::new(stdin);
 
-        let state: bool = input.trim().parse().expect("That is not bool");
-        input.clear();
+            let mut buffer = String::new();
 
-        tx.send(Signal { state }).await.expect("couldn't send");
-    }
+            reader.read_line(&mut buffer).await.expect("Couldn't read");
+
+            let input = buffer.trim().parse::<bool>();
+
+            match input {
+                Ok(state) => {
+                    tx.send(Signal { state }).await.expect("Couldn't send");
+                }
+                Err(_) => println!("That ain't bool"),
+            }
+        }
+    });
+
+    writer.await.unwrap();
+    reader.await.unwrap();
+
+    Ok(())
 }
