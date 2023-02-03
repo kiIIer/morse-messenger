@@ -1,7 +1,7 @@
 use morser::messenger_client::MessengerClient;
 use morser::Signal;
 use std::io::stdin;
-use tokio_stream::wrappers::ReceiverStream;
+use tokio_stream::{wrappers, StreamExt};
 
 pub mod morser {
     tonic::include_proto!("morser");
@@ -9,30 +9,33 @@ pub mod morser {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let channel = tonic::transport::channel::Channel::from_static("http://[::1]:50051")
-        .connect()
-        .await?;
+    let mut client = MessengerClient::connect("http://[::1]:50051")
+        .await
+        .expect("Couldn't connect");
 
-    let mut client = MessengerClient::new(channel);
+    let (tx, rx) = tokio::sync::mpsc::channel(8);
 
-    let (out_stream, rx) = tokio::sync::mpsc::channel(1);
+    let out_stream = wrappers::ReceiverStream::new(rx);
 
-    let request = tonic::Request::new(ReceiverStream::new(rx));
+    let response = client.chat(out_stream).await.expect("couldn't chat");
 
-    let mut in_stream = client.chat(request).await?.into_inner();
+    let mut in_stream = response.into_inner();
 
     tokio::spawn(async move {
-        while let Ok(Some(sig)) = in_stream.message().await {
-            println!("{}", sig.state)
+        while let Some(result) = in_stream.next().await {
+            let signal = result.expect("Got an error from server");
+            println!("\treceived message: `{}`", signal.state);
         }
     });
 
+    let mut input = String::new();
+
     loop {
-        let mut buffer = String::new();
-        stdin().read_line(&mut buffer);
+        stdin().read_line(&mut input).expect("Couldn't read line");
 
-        out_stream.send(Signal { state: true }).await?;
+        let state: bool = input.trim().parse().expect("That is not bool");
+        input.clear();
+
+        tx.send(Signal { state }).await.expect("couldn't send");
     }
-
-    Ok(())
 }
