@@ -46,7 +46,7 @@ impl Default for MessengerServer {
 
 #[tonic::async_trait]
 impl messenger_server::Messenger for MessengerServer {
-    type ChatStream = Pin<Box<dyn Stream<Item = Result<Signal, Status>> + Send>>;
+    type ChatStream = Pin<Box<dyn Stream<Item = Message> + Send>>;
 
     async fn chat(
         &self,

@@ -1,3 +1,3 @@
-pub mod morser {
-    tonic::include_proto!("morser");
-}
+pub mod morser;
+pub mod server;
+pub mod client;
