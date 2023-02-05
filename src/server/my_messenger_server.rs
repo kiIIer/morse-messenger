@@ -35,6 +35,7 @@ impl messenger_server::Messenger for MyMessengerServer {
             while let Some(result) = in_stream.next().await {
                 match result {
                     Ok(v) => {
+                        println!("{:?}", v);
                         tx.send(Ok(v)).expect("Couldn't send");
                     }
                     Err(err) => {
