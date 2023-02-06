@@ -1,6 +1,38 @@
+use tui::backend::Backend;
+use tui::layout::{Alignment, Rect};
+use tui::style::{Color, Modifier, Style};
+use tui::text::{Span, Spans};
+use tui::widgets::{Block, BorderType, Borders, Paragraph};
+use tui::Frame;
+
 pub struct HomeComponent {
     heading: String,
     tutorial: String,
+}
+
+impl HomeComponent {
+    pub fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect) {
+        let p = Paragraph::new(vec![
+            Spans::from(Span::styled(
+                &self.heading,
+                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+            )),
+            Spans::from(""),
+            Spans::from(Span::styled(
+                &self.tutorial,
+                Style::default().fg(Color::Black),
+            )),
+        ])
+        .alignment(Alignment::Center)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .border_type(BorderType::Plain),
+        );
+
+        f.render_widget(p, rect);
+    }
 }
 
 impl Default for HomeComponent {

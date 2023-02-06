@@ -9,9 +9,10 @@ edition = "2021"
 linker = "x86_64-w64-mingw32-gcc"
 
 [dependencies]
-crossterm = "0.26.0"
+crossterm = { version = "0.26.0", features = ["event-stream"] }
 futures = "0.3.26"
 futures-core = "0.3.26"
+futures-timer = "3.0.2"
 h2 = "0.3.15"
 prost = "0.11.6"
 rdev = { version = "0.5.2", features = ["unstable_grab"] }
