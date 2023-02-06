@@ -1,14 +1,18 @@
+use crate::client::app::AppState;
+use crate::client::events::{select_event, AppEvent};
 use crate::morser::messenger_client::MessengerClient;
 use crate::morser::Signal;
-use crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode};
-use crossterm::execute;
+use crossterm::event::{
+    self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+};
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
+use crossterm::{execute, ExecutableCommand};
 use rdev::{grab, Event as REvent, EventType, Key};
 use rodio::source::SineWave;
 use rodio::{OutputDevices, OutputStream, Sink};
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 use std::sync::mpsc as smpsc;
 use std::thread;
 use std::time::Duration;
@@ -19,10 +23,12 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
 use tokio_stream::{wrappers, StreamExt};
 use tonic::Streaming;
-use tui::backend::CrosstermBackend;
+use tui::backend::{Backend, CrosstermBackend};
+use tui::terminal::CompletedFrame;
 use tui::Terminal;
 
 mod app;
+mod events;
 
 async fn singer(mut stream: Streaming<Signal>, sink: Sink) {
     while let Some(result) = stream.next().await {
@@ -38,7 +44,7 @@ async fn singer(mut stream: Streaming<Signal>, sink: Sink) {
 }
 
 fn event_listener(tx: UnboundedSender<bool>) {
-    let callback = move |event: Event| -> Option<Event> {
+    let callback = move |event: REvent| -> Option<REvent> {
         match event.event_type {
             EventType::KeyPress(Key::Space) => {
                 tx.send(true).unwrap();
@@ -101,30 +107,63 @@ pub async fn execute1() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
-    enable_raw_mode()?;
-    let mut stdout = std::io::stdout();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+    setup_terminal()?;
 
-    // create app and run it
-    let tick_rate = 250;
+    let mut terminal = start_terminal(std::io::stdout())?;
 
-    let app = app::AppState::new(tick_rate);
-    let res = app::run_app(&mut terminal, app);
+    run_app(&mut terminal).await?;
 
-    // restore terminal
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    Terminal::show_cursor(&mut terminal)?;
+    shutdown_terminal();
+    Ok(())
+}
 
-    if let Err(err) = res {
-        println!("{:?}", err)
+async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn std::error::Error>> {
+    let mut app = AppState::new(200);
+
+    let mut reader = EventStream::new();
+
+    loop {
+        let event = select_event(app.tick_rate_d(), &mut reader).await;
+
+        match event {
+            AppEvent::Tick => {
+                app.on_tick();
+            }
+            AppEvent::CEvent(event) => {
+                return Ok(());
+            }
+        }
+
+        draw(terminal, &app)?;
     }
+}
+
+fn setup_terminal() -> Result<(), io::Error> {
+    enable_raw_mode()?;
+    std::io::stdout().execute(EnterAlternateScreen)?;
+    Ok(())
+}
+
+fn start_terminal<W: std::io::Write>(buf: W) -> io::Result<Terminal<CrosstermBackend<W>>> {
+    let backend = CrosstermBackend::new(buf);
+    let mut terminal = Terminal::new(backend)?;
+    terminal.hide_cursor()?;
+    terminal.clear()?;
+
+    Ok(terminal)
+}
+
+fn shutdown_terminal() {
+    std::io::stdout()
+        .execute(LeaveAlternateScreen)
+        .expect("Couldn't exit Alternate Screen");
+    disable_raw_mode().expect("Couldn't disable raw mode");
+}
+
+fn draw<'a, B: Backend>(terminal: &mut Terminal<B>, app: &AppState) -> io::Result<()> {
+    terminal.draw(|f| {
+        app.draw(f);
+    })?;
 
     Ok(())
 }
