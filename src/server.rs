@@ -10,7 +10,7 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
     let server = MyMessengerServer::default();
     Server::builder()
         .add_service(MessengerServer::new(server))
-        .serve("[::1]:50051".to_socket_addrs().unwrap().next().unwrap())
+        .serve("192.168.1.41:50051".to_socket_addrs().unwrap().next().unwrap())
         .await
         .unwrap();
     Ok(())
