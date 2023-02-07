@@ -15,15 +15,15 @@ impl Default for SignalComponent {
     fn default() -> Self {
         SignalComponent {
             signal: false,
-            signal_data: (0..100).into_iter().map(|i| (i as f64, 0.0)).collect(),
-            window: [0.0, 100.0],
+            signal_data: (0..200).into_iter().map(|i| (i as f64, 0.0)).collect(),
+            window: [0.0, 200.0],
         }
     }
 }
 
 impl SignalComponent {
     pub fn on_tick(&mut self) {
-        for _ in 0..4 {
+        for _ in 0..8 {
             self.signal_data.remove(0);
         }
         let chart_state = match self.signal {
@@ -31,12 +31,12 @@ impl SignalComponent {
             false => 0.0,
         };
         let last_end = (self.signal_data[self.signal_data.len() - 1].0 + 1.0) as i64;
-        let a = last_end..last_end + 4;
+        let a = last_end..last_end + 8;
         self.signal_data
             .extend(a.into_iter().map(|x| (x as f64, chart_state)));
 
-        self.window[0] += 4.0;
-        self.window[1] += 4.0;
+        self.window[0] += 8.0;
+        self.window[1] += 8.0;
     }
 
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {
