@@ -11,5 +11,5 @@ impl Default for TransComponent {
 }
 
 impl TransComponent {
-    fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {}
+    pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {}
 }

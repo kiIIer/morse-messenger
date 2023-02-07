@@ -11,5 +11,5 @@ impl Default for CheatComponent {
 }
 
 impl CheatComponent {
-    fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {}
+    pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {}
 }
