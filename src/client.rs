@@ -1,5 +1,6 @@
 use crate::client::app::AppState;
-use crate::client::events::{select_event, AppEvent};
+use crate::client::events::{select_event, ticker, AppEvent};
+use crate::client::sound::{setup_sink, singer};
 use crate::morser::messenger_client::MessengerClient;
 use crate::morser::Signal;
 use crossterm::event::{
@@ -9,13 +10,13 @@ use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
 use crossterm::{execute, ExecutableCommand};
-use rdev::{grab, Event as REvent, EventType, Key};
+use rdev::{grab, listen, Event as REvent, EventType, Key};
 use rodio::source::SineWave;
 use rodio::{OutputDevices, OutputStream, Sink};
 use std::fmt::{Display, Write};
 use std::sync::mpsc as smpsc;
-use std::thread;
 use std::time::Duration;
+use std::{process, thread};
 use tokio::io;
 use tokio::io::{AsyncBufReadExt, AsyncRead};
 use tokio::join;
@@ -30,8 +31,9 @@ use tui::Terminal;
 mod app;
 mod events;
 mod morse;
+mod sound;
 
-async fn singer(mut stream: Streaming<Signal>, sink: Sink) {
+async fn singer1(mut stream: Streaming<Signal>, sink: Sink) {
     while let Some(result) = stream.next().await {
         let value = result.expect("Couldn't read from provided stream");
         if value.state {
@@ -97,7 +99,7 @@ pub async fn execute1() -> Result<(), Box<dyn std::error::Error>> {
 
     let change = tokio::spawn(change_manager(rx, to_server));
 
-    let singer = tokio::spawn(singer(in_stream, sink));
+    let singer = tokio::spawn(singer1(in_stream, sink));
     let event_listener = thread::spawn(move || event_listener(tx));
 
     change.await?;
@@ -114,32 +116,42 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
 
     run_app(&mut terminal).await?;
 
-    shutdown_terminal();
     Ok(())
 }
 
 async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn std::error::Error>> {
-    let mut app = AppState::new(200);
-
     let mut reader = EventStream::new();
+    let (tx_r, mut rx_r) = mpsc::unbounded_channel();
+    let (tx_t, mut rx_t) = mpsc::unbounded_channel();
+    let (tx_s, mut rx_s) = mpsc::unbounded_channel();
+
+    let (_stream, _stream_handle, sink) = setup_sink();
+
+    let mut app = AppState::new(200, tx_s);
+
+    tokio::task::spawn_blocking(|| system_signal(tx_r));
+    tokio::spawn(ticker(app.tick_rate_d(), tx_t));
+    tokio::spawn(singer(rx_s, sink));
 
     loop {
-        let event = select_event(app.tick_rate_d(), &mut reader).await;
+        let event = select_event(&mut rx_t, &mut reader, &mut rx_r).await;
 
         match event {
             AppEvent::Tick => {
                 app.on_tick();
             }
             AppEvent::CEvent(event) => app.handle_c_event(event),
+            AppEvent::SysSigOff => app.signal_off(),
+            AppEvent::SysSigOn => app.signal_on(),
         }
 
         if app.should_quit() {
-            break;
+            shutdown_terminal();
+            process::exit(0);
         }
 
         draw(terminal, &app)?;
     }
-    Ok(())
 }
 
 fn setup_terminal() -> Result<(), io::Error> {
@@ -170,4 +182,27 @@ fn draw<'a, B: Backend>(terminal: &mut Terminal<B>, app: &AppState) -> io::Resul
     })?;
 
     Ok(())
+}
+
+fn system_signal(tx: UnboundedSender<AppEvent>) {
+    eprintln!("Started system sinal");
+    let mut inner_state = Box::new(false);
+    let callback = move |event: REvent| match event.event_type {
+        EventType::KeyPress(Key::Space) => {
+            if !*inner_state {
+                *inner_state = !*inner_state;
+                tx.send(AppEvent::SysSigOn).unwrap();
+            }
+        }
+        EventType::KeyRelease(Key::Space) => {
+            if *inner_state {
+                *inner_state = !*inner_state;
+                tx.send(AppEvent::SysSigOff).unwrap();
+            }
+        }
+        _ => {}
+    };
+    if let Err(error) = listen(callback) {
+        println!("Error: {:?}", error);
+    }
 }
