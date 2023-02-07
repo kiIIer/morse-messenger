@@ -40,7 +40,7 @@ impl AppState {
     }
 
     pub fn on_tick(&mut self) {
-        self.signal.on
+        self.signal.on_tick();
     }
 
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
