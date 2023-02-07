@@ -1,4 +1,7 @@
+use crate::client::app::components::cheat::CheatComponent;
 use crate::client::app::components::home::HomeComponent;
+use crate::client::app::components::signal::SignalComponent;
+use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use std::time::Duration;
 use tui::backend::Backend;
 use tui::layout::Rect;
@@ -9,6 +12,10 @@ mod components;
 
 pub struct AppState {
     homepage: HomeComponent,
+    cheatsheet: CheatComponent,
+    signal: SignalComponent,
+    tabs: TabsComponent,
+    active_tab: MenuItem,
 
     // millis
     tick_rate: i32,
@@ -17,7 +24,11 @@ pub struct AppState {
 impl AppState {
     pub fn new(tick_rate: i32) -> AppState {
         AppState {
-            homepage: HomeComponent::default(),
+            homepage: Default::default(),
+            cheatsheet: Default::default(),
+            signal: Default::default(),
+            tabs: Default::default(),
+            active_tab: MenuItem::Home,
             tick_rate,
         }
     }
