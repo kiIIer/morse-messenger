@@ -2,6 +2,7 @@ use crate::client::app::components::cheat::CheatComponent;
 use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
+use crossterm::event::Event as CEvent;
 use std::time::Duration;
 use tui::backend::Backend;
 use tui::layout::Rect;
@@ -52,4 +53,6 @@ impl AppState {
     pub fn tick_rate_d(&self) -> Duration {
         Duration::from_millis(self.tick_rate as u64)
     }
+
+    pub fn handle_c_event(&self, event: CEvent) {}
 }

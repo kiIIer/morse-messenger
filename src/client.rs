@@ -129,9 +129,7 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn s
             AppEvent::Tick => {
                 app.on_tick();
             }
-            AppEvent::CEvent(event) => {
-                return Ok(());
-            }
+            AppEvent::CEvent(event) => app.handle_c_event(event),
         }
 
         draw(terminal, &app)?;
