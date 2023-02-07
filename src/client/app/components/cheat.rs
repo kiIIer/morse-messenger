@@ -2,7 +2,7 @@ use crate::client::app::components::signal::SignalComponent;
 use crate::client::morse::Letter::*;
 use crate::client::morse::{Letter, Morse};
 use tui::backend::Backend;
-use tui::layout::{Constraint, Rect};
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::text::Span;
 use tui::widgets::{Block, Borders, Cell, Row, Table};
@@ -25,7 +25,10 @@ impl Default for CheatComponent {
 
 impl CheatComponent {
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect, sig: &SignalComponent) {
-
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Length(15), Constraint::Min(2)].as_ref())
+            .split(area);
 
         let alpha_data: Vec<Row> = self
             .alphabet
@@ -58,16 +61,17 @@ impl CheatComponent {
             )
             .header(Row::new(vec![
                 Cell::from(Span::styled(
-                    "Letter",
-                    Style::default().add_modifier(Modifier::BOLD),
+                    "Le",
+                    Style::default().add_modifier(Modifier::BOLD).fg(Color::Red),
                 )),
                 Cell::from(Span::styled(
                     "Morse",
-                    Style::default().add_modifier(Modifier::BOLD),
+                    Style::default().add_modifier(Modifier::BOLD).fg(Color::Red),
                 )),
             ]))
             .widths(&[Constraint::Percentage(20), Constraint::Percentage(80)]);
 
-        f.render_widget(table, area);
+        f.render_widget(table, chunks[0]);
+        sig.draw(f, chunks[1]);
     }
 }
