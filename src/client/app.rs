@@ -39,7 +39,9 @@ impl AppState {
         }
     }
 
-    pub fn on_tick(&mut self) {}
+    pub fn on_tick(&mut self) {
+        self.signal.on
+    }
 
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
         let fsize = f.size();
@@ -61,6 +63,7 @@ impl AppState {
     pub fn tick_rate(&self) -> i32 {
         self.tick_rate
     }
+
     pub fn tick_rate_d(&self) -> Duration {
         Duration::from_millis(self.tick_rate as u64)
     }
