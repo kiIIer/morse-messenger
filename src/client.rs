@@ -30,6 +30,7 @@ use tui::Terminal;
 mod app;
 mod events;
 mod morse;
+mod sound;
 
 async fn singer(mut stream: Streaming<Signal>, sink: Sink) {
     while let Some(result) = stream.next().await {
