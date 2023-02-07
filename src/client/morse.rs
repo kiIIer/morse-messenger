@@ -1,5 +1,15 @@
 pub enum Morse {
     Dit,
     Dah,
-    No,
+    Space,
+}
+
+impl From<Morse> for char {
+    fn from(value: Morse) -> Self {
+        match value {
+            Dit => '•',
+            Dah => '—',
+            No => ' ',
+        }
+    }
 }
