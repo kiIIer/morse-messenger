@@ -110,31 +110,45 @@ pub async fn execute1() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
+    let mut client = MessengerClient::connect("http://192.168.1.41:50051")
+        .await
+        .expect("Couldn't connect");
+    let (tx_server, rx) = mpsc::unbounded_channel();
+
+    let out_stream = wrappers::UnboundedReceiverStream::new(rx);
+
+    let response = client.chat(out_stream).await.expect("couldn't chat");
+    let rx_server = response.into_inner();
+
     setup_terminal()?;
 
     let mut terminal = start_terminal(std::io::stdout())?;
 
-    run_app(&mut terminal).await?;
+    run_app(&mut terminal, tx_server, rx_server).await?;
 
     Ok(())
 }
 
-async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn std::error::Error>> {
+async fn run_app<B: Backend>(
+    terminal: &mut Terminal<B>,
+    to_server: UnboundedSender<Signal>,
+    from_server: Streaming<Signal>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut reader = EventStream::new();
     let (tx_r, mut rx_r) = mpsc::unbounded_channel();
     let (tx_t, mut rx_t) = mpsc::unbounded_channel();
-    let (tx_s, mut rx_s) = mpsc::unbounded_channel();
+    let (tx_s, rx_s) = mpsc::unbounded_channel();
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
-    let mut app = AppState::new(200, tx_s);
+    let mut app = AppState::new(200, tx_s, to_server, from_server);
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
     tokio::spawn(singer(rx_s, sink));
 
     loop {
-        let event = select_event(&mut rx_t, &mut reader, &mut rx_r).await;
+        let event = select_event(&mut rx_t, &mut reader, &mut rx_r, app.rx_server()).await;
 
         match event {
             AppEvent::Tick => {
@@ -143,6 +157,7 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn s
             AppEvent::CEvent(event) => app.handle_c_event(event),
             AppEvent::SysSigOff => app.signal_off(),
             AppEvent::SysSigOn => app.signal_on(),
+            AppEvent::Server(signal) => app.set_signal(signal.state),
         }
 
         if app.should_quit() {
