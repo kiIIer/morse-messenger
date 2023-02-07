@@ -3,10 +3,12 @@ use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use crate::client::app::components::trans::TransComponent;
+use crate::morser::Signal;
 use crossterm::event::Event::Key;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
+use tonic::Streaming;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::Frame;
@@ -14,6 +16,9 @@ use tui::Frame;
 mod components;
 
 pub struct AppState {
+    tx_server: UnboundedSender<Signal>,
+    rx_server: Streaming<Signal>,
+
     homepage: HomeComponent,
     cheatsheet: CheatComponent,
     signal: SignalComponent,
@@ -31,8 +36,15 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(tick_rate: i32, tx_sound: UnboundedSender<bool>) -> AppState {
+    pub fn new(
+        tick_rate: i32,
+        tx_sound: UnboundedSender<bool>,
+        tx_server: UnboundedSender<Signal>,
+        rx_server: Streaming<Signal>,
+    ) -> AppState {
         AppState {
+            tx_server,
+            rx_server,
             homepage: Default::default(),
             cheatsheet: Default::default(),
             signal: Default::default(),
@@ -62,6 +74,8 @@ impl AppState {
         self.tx_sound.send(false).expect("Couldn't send sound");
         self.signal.set_signal(false);
     }
+
+    pub async fn send_signal(state: bool) {}
 
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
         let fsize = f.size();
@@ -103,5 +117,12 @@ impl AppState {
     }
     pub fn should_quit(&self) -> bool {
         self.should_quit
+    }
+
+    pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+        &self.tx_server
+    }
+    pub fn rx_server(&self) -> &Streaming<Signal> {
+        &self.rx_server
     }
 }
