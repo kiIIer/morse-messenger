@@ -132,8 +132,13 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn s
             AppEvent::CEvent(event) => app.handle_c_event(event),
         }
 
+        if app.should_quit() {
+            break;
+        }
+
         draw(terminal, &app)?;
     }
+    Ok(())
 }
 
 fn setup_terminal() -> Result<(), io::Error> {
