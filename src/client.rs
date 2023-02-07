@@ -148,7 +148,7 @@ async fn run_app<B: Backend>(
     tokio::spawn(singer(rx_s, sink));
 
     loop {
-        let event = select_event(&mut rx_t, &mut reader, &mut rx_r).await;
+        let event = select_event(&mut rx_t, &mut reader, &mut rx_r, app.rx_server()).await;
 
         match event {
             AppEvent::Tick => {
@@ -157,6 +157,7 @@ async fn run_app<B: Backend>(
             AppEvent::CEvent(event) => app.handle_c_event(event),
             AppEvent::SysSigOff => app.signal_off(),
             AppEvent::SysSigOn => app.signal_on(),
+            AppEvent::Server(signal) => app.set_signal(signal.state),
         }
 
         if app.should_quit() {

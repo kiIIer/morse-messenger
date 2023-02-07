@@ -61,18 +61,25 @@ impl AppState {
         self.signal.on_tick();
     }
 
+    pub fn set_signal(&mut self, state: bool) {
+        self.signal.set_signal(state);
+        self.tx_sound.send(state).expect("Couldn't send sound");
+    }
+
     pub fn signal(&self) -> bool {
         self.signal.signal()
     }
 
     pub fn signal_on(&mut self) {
-        self.tx_sound.send(true).expect("Couldn't send sound");
-        self.signal.set_signal(true);
+        self.tx_server
+            .send(Signal { state: true })
+            .expect("Couldn't send sound");
     }
 
     pub fn signal_off(&mut self) {
-        self.tx_sound.send(false).expect("Couldn't send sound");
-        self.signal.set_signal(false);
+        self.tx_server
+            .send(Signal { state: false })
+            .expect("Couldn't send sound");
     }
 
     pub async fn send_signal(state: bool) {}
@@ -122,7 +129,7 @@ impl AppState {
     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
         &self.tx_server
     }
-    pub fn rx_server(&self) -> &Streaming<Signal> {
-        &self.rx_server
+    pub fn rx_server(&mut self) -> &mut Streaming<Signal> {
+        &mut self.rx_server
     }
 }
