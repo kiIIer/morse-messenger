@@ -1,4 +1,5 @@
 use crate::client::events::AppEvent::Tick;
+use crate::morser::Signal;
 use crossterm::event::{Event as CEvent, EventStream};
 use futures::FutureExt;
 use futures_timer::Delay;
@@ -7,6 +8,7 @@ use std::time::Duration;
 use tokio::select;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio_stream::StreamExt;
+use tonic::Streaming;
 
 #[derive(Debug)]
 pub enum AppEvent {
@@ -14,16 +16,18 @@ pub enum AppEvent {
     CEvent(CEvent),
     SysSigOn,
     SysSigOff,
+    Server(Signal),
 }
 
 pub async fn select_event(
     rx_t: &mut UnboundedReceiver<AppEvent>,
     reader: &mut EventStream,
     rx_r: &mut UnboundedReceiver<AppEvent>,
+    rx_s: &mut Streaming<Signal>,
 ) -> AppEvent {
     if let Ok(_) = rx_t.try_recv() {
         return Tick;
-    };
+    }
     select! {
         Some(event) = rx_t.recv() => {
             return event;
@@ -33,6 +37,10 @@ pub async fn select_event(
         }
         Some(event) = rx_r.recv() => {
             return event;
+        }
+        // TODO: Handle err
+        Some(Ok(signal)) = rx_s.next() => {
+            return AppEvent::Server(signal);
         }
     }
 }
