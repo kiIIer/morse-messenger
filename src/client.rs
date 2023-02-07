@@ -1,5 +1,6 @@
 use crate::client::app::AppState;
 use crate::client::events::{select_event, ticker, AppEvent};
+use crate::client::sound::{setup_sink, singer};
 use crate::morser::messenger_client::MessengerClient;
 use crate::morser::Signal;
 use crossterm::event::{
@@ -32,7 +33,7 @@ mod events;
 mod morse;
 mod sound;
 
-async fn singer(mut stream: Streaming<Signal>, sink: Sink) {
+async fn singer1(mut stream: Streaming<Signal>, sink: Sink) {
     while let Some(result) = stream.next().await {
         let value = result.expect("Couldn't read from provided stream");
         if value.state {
@@ -98,7 +99,7 @@ pub async fn execute1() -> Result<(), Box<dyn std::error::Error>> {
 
     let change = tokio::spawn(change_manager(rx, to_server));
 
-    let singer = tokio::spawn(singer(in_stream, sink));
+    let singer = tokio::spawn(singer1(in_stream, sink));
     let event_listener = thread::spawn(move || event_listener(tx));
 
     change.await?;
@@ -119,14 +120,18 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn std::error::Error>> {
-    let mut app = AppState::new(200);
-
     let mut reader = EventStream::new();
     let (tx_r, mut rx_r) = mpsc::unbounded_channel();
     let (tx_t, mut rx_t) = mpsc::unbounded_channel();
+    let (tx_s, mut rx_s) = mpsc::unbounded_channel();
+
+    let (_stream, _stream_handle, sink) = setup_sink();
+
+    let mut app = AppState::new(200, tx_s);
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
+    tokio::spawn(singer(rx_s, sink));
 
     loop {
         let event = select_event(&mut rx_t, &mut reader, &mut rx_r).await;
@@ -136,8 +141,8 @@ async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> Result<(), Box<dyn s
                 app.on_tick();
             }
             AppEvent::CEvent(event) => app.handle_c_event(event),
-            AppEvent::SysSigOff => app.set_signal(false),
-            AppEvent::SysSigOn => app.set_signal(true),
+            AppEvent::SysSigOff => app.signal_off(),
+            AppEvent::SysSigOn => app.signal_on(),
         }
 
         if app.should_quit() {

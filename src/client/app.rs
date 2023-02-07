@@ -6,6 +6,7 @@ use crate::client::app::components::trans::TransComponent;
 use crossterm::event::Event::Key;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
+use tokio::sync::mpsc::UnboundedSender;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::Frame;
@@ -18,15 +19,19 @@ pub struct AppState {
     signal: SignalComponent,
     trans: TransComponent,
     tab: TabsComponent,
+
     active_tab: MenuItem,
+
     should_quit: bool,
+
+    tx_sound: UnboundedSender<bool>,
 
     // millis
     tick_rate: i32,
 }
 
 impl AppState {
-    pub fn new(tick_rate: i32) -> AppState {
+    pub fn new(tick_rate: i32, tx_sound: UnboundedSender<bool>) -> AppState {
         AppState {
             homepage: Default::default(),
             cheatsheet: Default::default(),
@@ -35,6 +40,7 @@ impl AppState {
             tab: Default::default(),
             active_tab: MenuItem::Home,
             tick_rate,
+            tx_sound,
             should_quit: false,
         }
     }
@@ -47,8 +53,14 @@ impl AppState {
         self.signal.signal()
     }
 
-    pub fn set_signal(&mut self, signal: bool) {
-        self.signal.set_signal(signal);
+    pub fn signal_on(&mut self) {
+        self.tx_sound.send(true).expect("Couldn't send sound");
+        self.signal.set_signal(true);
+    }
+
+    pub fn signal_off(&mut self) {
+        self.tx_sound.send(false).expect("Couldn't send sound");
+        self.signal.set_signal(false);
     }
 
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
