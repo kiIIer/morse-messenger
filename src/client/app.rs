@@ -2,13 +2,13 @@ use crate::client::app::components::cheat::CheatComponent;
 use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
+use crate::client::app::components::trans::TransComponent;
 use crossterm::event::Event::Key;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::Frame;
-use crate::client::app::components::trans::TransComponent;
 
 mod components;
 
@@ -53,7 +53,7 @@ impl AppState {
         match self.active_tab {
             MenuItem::Home => self.homepage.draw(f, chunks_main[1]),
             MenuItem::Signal => self.signal.draw(f, chunks_main[1]),
-            MenuItem::Cheat => self.cheatsheet.draw(f, chunks_main[1]),
+            MenuItem::Cheat => self.cheatsheet.draw(f, chunks_main[1], &self.signal),
             MenuItem::Trans => self.trans.draw(f, chunks_main[1]),
         }
     }

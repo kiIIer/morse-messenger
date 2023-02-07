@@ -48,6 +48,13 @@ pub enum Letter {
 
 impl From<Morse> for char {
     fn from(value: Morse) -> Self {
+        let l = &value;
+        l.into()
+    }
+}
+
+impl From<&Morse> for char {
+    fn from(value: &Morse) -> Self {
         match value {
             Dit => '•',
             Dah => '—',
@@ -56,8 +63,8 @@ impl From<Morse> for char {
     }
 }
 
-impl From<Letter> for Vec<Morse> {
-    fn from(value: Letter) -> Self {
+impl From<&Letter> for Vec<Morse> {
+    fn from(value: &Letter) -> Self {
         match value {
             Letter::A => vec![Dit, Dah],
             Letter::B => vec![Dah, Dit, Dit, Dit],
@@ -100,8 +107,8 @@ impl From<Letter> for Vec<Morse> {
     }
 }
 
-impl From<Letter> for char {
-    fn from(value: Letter) -> Self {
+impl From<&Letter> for char {
+    fn from(value: &Letter) -> Self {
         match value {
             Letter::A => 'A',
             Letter::B => 'B',
