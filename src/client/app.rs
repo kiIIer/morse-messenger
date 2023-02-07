@@ -43,6 +43,14 @@ impl AppState {
         self.signal.on_tick();
     }
 
+    pub fn signal(&self) -> bool {
+        self.signal.signal()
+    }
+
+    pub fn set_signal(&mut self, signal: bool) {
+        self.signal.set_signal(signal);
+    }
+
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
         let fsize = f.size();
 
