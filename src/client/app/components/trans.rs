@@ -18,11 +18,11 @@ pub struct TransComponent {
 impl Default for TransComponent {
     fn default() -> Self {
         TransComponent {
-            received: String::from("me kind of a test message which will be transmitted and it should be long so, hippoty hoppoty lorem ipsum my property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"),
+            received: String::new(),
 
             to_send: vec![],
-            sending: String::from("This is some kind of a test message which will be transmitted and it should be long so, hippoty hoppoty lorem ipsum my property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"),
-            sent: 10
+            sending: String::new(),
+            sent: 0,
         }
     }
 }

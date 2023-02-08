@@ -155,7 +155,11 @@ impl AppState {
                     KeyCode::Esc => self.mode = Mode::Normal,
                     KeyCode::Backspace => self.pop_to_send(),
                     KeyCode::Enter => {
-                        self.trans.pending_add();
+                        let letters = self.trans.pending_add();
+
+                        for letter in letters {
+                            self.tx_letter.send(letter).expect("Couldn't send letter");
+                        }
                     }
                     Char(symbol) => {
                         if let Some(letter) = convert(symbol) {
