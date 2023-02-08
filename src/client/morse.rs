@@ -1,3 +1,9 @@
+use crate::morser::Signal;
+use futures::FutureExt;
+use futures_timer::Delay;
+use std::time::Duration;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::time::MissedTickBehavior::Delay;
 use Morse::{Dah, Dit, Space};
 
 pub enum Morse {
@@ -148,5 +154,41 @@ impl From<&Letter> for char {
             Letter::N9 => '9',
             Letter::Space => ' ',
         }
+    }
+}
+
+pub async fn morse_transmitter(
+    mut rx: UnboundedReceiver<Morse>,
+    tx: UnboundedSender<Signal>,
+    time_unit: Duration,
+) {
+    let time_unit = time_unit.clone();
+    while let Some(morse) = rx.recv().await {
+        match morse {
+            Dit => {
+                tx.send(Signal { state: true })
+                    .expect("Couldn't send to server");
+
+                Delay::new(time_unit).fuse().await;
+
+                tx.send(Signal { state: false })
+                    .expect("Couldn't send to server");
+            }
+
+            Dah => {
+                tx.send(Signal { state: true })
+                    .expect("Couldn't send to server");
+
+                Delay::new(time_unit * 3).fuse().await;
+
+                tx.send(Signal { state: false })
+                    .expect("Couldn't send to server");
+            }
+
+            Space => {
+                Delay::new(time_unit).fuse().await;
+            }
+        }
+        Delay::new(time_unit * 3).fuse().await;
     }
 }
