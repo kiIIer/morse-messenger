@@ -127,6 +127,14 @@ impl AppState {
         Duration::from_millis(self.tick_rate as u64)
     }
 
+    pub fn add_to_send(&mut self, letter: Letter) {
+        self.trans.add_to_send(letter)
+    }
+
+    pub fn pop_to_send(&mut self) {
+        self.trans.pop_to_send()
+    }
+
     pub fn handle_c_event(&mut self, event: CEvent) {
         match self.mode {
             Mode::Normal => match event {
@@ -145,9 +153,10 @@ impl AppState {
             Mode::Input => match event {
                 Key(key) => match key.code {
                     KeyCode::Esc => self.mode = Mode::Normal,
+                    KeyCode::Backspace => self.pop_to_send(),
                     Char(symbol) => {
                         if let Some(letter) = convert(symbol) {
-                            self.tx_letter.send(letter).expect("Couldn't send morse");
+                            self.add_to_send(letter)
                         }
                     }
                     _ => {}

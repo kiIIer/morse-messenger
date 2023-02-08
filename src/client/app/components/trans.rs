@@ -1,5 +1,6 @@
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::morse::Letter;
+use tokio_stream::StreamExt;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Style};
@@ -9,7 +10,7 @@ use tui::Frame;
 
 pub struct TransComponent {
     received: String,
-    to_send: String,
+    to_send: Vec<Letter>,
     sending: String,
     sent: usize,
 }
@@ -19,7 +20,7 @@ impl Default for TransComponent {
         TransComponent {
             received: String::from("me kind of a test message which will be transmitted and it should be long so, hippoty hoppoty lorem ipsum my property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"),
 
-            to_send: String::from("Hi mom"),
+            to_send: vec![],
             sending: String::from("This is some kind of a test message which will be transmitted and it should be long so, hippoty hoppoty lorem ipsum my property. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"),
             sent: 10
         }
@@ -56,6 +57,14 @@ impl TransComponent {
         self.received.push(letter);
     }
 
+    pub fn add_to_send(&mut self, letter: Letter) {
+        self.to_send.push(letter)
+    }
+
+    pub fn pop_to_send(&mut self) {
+        self.to_send.pop();
+    }
+
     fn draw_receiving<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {
         let max_line_len = area.width - 2;
         let max_lines = area.height - 2;
@@ -89,8 +98,16 @@ impl TransComponent {
     }
 
     fn draw_to_send<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {
+        let to_send = self
+            .to_send
+            .iter()
+            .map(|l| l.into())
+            .fold(String::new(), |mut acc, l| {
+                acc.push(l);
+                acc
+            });
         let to_send = Paragraph::new(vec![Spans::from(Span::styled(
-            &self.to_send,
+            to_send,
             Style::default().fg(Color::Red),
         ))])
         .block(Block::default().borders(Borders::ALL).title("Your message"));
