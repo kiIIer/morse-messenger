@@ -120,6 +120,7 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
     let response = client.chat(out_stream).await.expect("couldn't chat");
     let rx_server = response.into_inner();
 
+    chain_hook();
     setup_terminal()?;
 
     let mut terminal = start_terminal(std::io::stdout())?;
@@ -220,4 +221,13 @@ fn system_signal(tx: UnboundedSender<AppEvent>) {
     if let Err(error) = listen(callback) {
         println!("Error: {:?}", error);
     }
+}
+
+fn chain_hook() {
+    let original_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |panic| {
+        shutdown_terminal();
+        original_hook(panic);
+    }));
 }
