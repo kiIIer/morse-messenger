@@ -17,7 +17,7 @@ use tui::Frame;
 
 mod components;
 
-enum Mode {
+pub enum Mode {
     Input,
     Normal,
 }
@@ -114,7 +114,8 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(2)].as_ref())
             .split(fsize);
 
-        self.tab.draw(f, chunks_main[0], self.active_tab);
+        self.tab
+            .draw(f, chunks_main[0], self.active_tab, &self.mode);
         match self.active_tab {
             MenuItem::Home => self.homepage.draw(f, chunks_main[1]),
             MenuItem::Signal => self.signal.draw(f, chunks_main[1]),

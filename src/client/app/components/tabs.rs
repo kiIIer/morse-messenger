@@ -1,8 +1,10 @@
+use crate::client::app::Mode;
+use std::any::Any;
 use tui::backend::Backend;
-use tui::layout::Rect;
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Tabs};
+use tui::widgets::{Block, Borders, Paragraph, Tabs};
 use tui::Frame;
 
 #[derive(Copy, Clone)]
@@ -42,7 +44,12 @@ impl Default for TabsComponent {
 }
 
 impl TabsComponent {
-    pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect, active: MenuItem) {
+    pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect, active: MenuItem, mode: &Mode) {
+        let main_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Min(10), Constraint::Length(6)].as_ref())
+            .split(area);
+
         let tab_titles = self
             .titles
             .iter()
@@ -65,6 +72,19 @@ impl TabsComponent {
             )
             .highlight_style(Style::default().fg(Color::LightRed));
 
-        f.render_widget(tabs, area)
+        f.render_widget(tabs, main_chunks[0]);
+
+        let mode_text = match mode {
+            Mode::Normal => "NORM",
+            Mode::Input => "INPT",
+        };
+
+        let mode = Paragraph::new(vec![Spans::from(Span::styled(
+            mode_text,
+            Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+        ))])
+        .block(Block::default().borders(Borders::ALL).title("Mode"));
+
+        f.render_widget(mode, main_chunks[1]);
     }
 }
