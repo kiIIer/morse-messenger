@@ -1,4 +1,3 @@
-use crate::client::morse::MorseDelay::Letter;
 use crate::morser::Signal;
 use futures::FutureExt;
 use futures_core::Stream;
@@ -55,6 +54,7 @@ pub enum Letter {
     N7,
     N8,
     N9,
+    Dot,
     Space,
     None,
 }
@@ -79,7 +79,7 @@ impl From<&Morse> for char {
 
 impl From<Vec<Morse>> for Letter {
     fn from(value: Vec<Morse>) -> Self {
-        if value.len() == 0 || value.len() > 5 {
+        if value.len() == 0 || value.len() > 6 {
             return Letter::None;
         }
 
@@ -191,6 +191,9 @@ impl From<Vec<Morse>> for Letter {
         if compare(&value, &vec![Dah, Dah, Dah, Dah, Dit]) {
             return Letter::N9;
         }
+        if compare(&value, &vec![Dit, Dah, Dit, Dah, Dit, Dah]) {
+            return Letter::Dot;
+        }
 
         Letter::None
     }
@@ -249,6 +252,7 @@ impl From<&Letter> for Vec<Morse> {
             Letter::N7 => vec![Dah, Dah, Dit, Dit, Dit],
             Letter::N8 => vec![Dah, Dah, Dah, Dit, Dit],
             Letter::N9 => vec![Dah, Dah, Dah, Dah, Dit],
+            Letter::Dot => vec![Dit, Dah, Dit, Dah, Dit, Dah],
             Letter::Space => vec![Space],
             Letter::None => vec![Morse::None],
         }
@@ -300,6 +304,7 @@ impl From<&Letter> for char {
             Letter::N7 => '7',
             Letter::N8 => '8',
             Letter::N9 => '9',
+            Letter::Dot => '.',
             Letter::Space => ' ',
             Letter::None => '?',
         }
@@ -368,15 +373,15 @@ enum MorseSignal {
 }
 
 async fn morse_receiver(
-    mut signal_in: Streaming<Signal>,
+    mut signal_in: UnboundedReceiver<Signal>,
     tx_morse: UnboundedSender<MorseSignal>,
     time_unit: Duration,
     precision: f64,
 ) {
     let mut last = (false, Instant::now());
-    while let Some(signal) = signal_in.next().await {
-        //     TODO: handle error
-        let current = signal.expect("Error from server");
+    while let Some(signal) = signal_in.recv().await {
+        let duration = last.1.elapsed();
+        let current = signal;
         let now = Instant::now();
 
         if last.0 == current.state {
@@ -385,9 +390,11 @@ async fn morse_receiver(
 
         last = (current.state, now);
 
-        let duration = last.1.elapsed();
-
-        let ratio = duration.as_micros() as f64 / time_unit.as_micros() as f64;
+        let ratio = if duration > time_unit * 7 {
+            7.0
+        } else {
+            duration.as_millis() as f64 / time_unit.as_millis() as f64
+        };
 
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
             if current.state {
@@ -404,7 +411,7 @@ async fn morse_receiver(
             }
         }
 
-        let ratio = ratio * 3.0;
+        let ratio = ratio / 3.0;
 
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
             if current.state {
@@ -418,11 +425,15 @@ async fn morse_receiver(
             }
         }
 
-        let ratio = ratio * 2.33;
+        let ratio = ratio / 2.33333;
 
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
             if current.state {
+                tx_morse
+                    .send(MorseSignal::Off(MorseDelay::Word))
+                    .expect("Fail");
                 tx_morse.send(MorseSignal::On(Morse::Space)).expect("Smth");
+
                 continue;
             }
         }
@@ -432,7 +443,7 @@ async fn morse_receiver(
 }
 
 pub async fn letter_receiver(
-    signal_in: Streaming<Signal>,
+    signal_in: UnboundedReceiver<Signal>,
     tx_l: UnboundedSender<Letter>,
     time_unit: Duration,
     precision: f64,
@@ -510,6 +521,7 @@ pub fn convert(symbol: char) -> Option<Letter> {
         '7' => Some(Letter::N7),
         '8' => Some(Letter::N8),
         '9' => Some(Letter::N9),
+        '.' => Some(Letter::Dot),
         ' ' => Some(Letter::Space),
         _ => None,
     }

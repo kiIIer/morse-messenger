@@ -9,7 +9,7 @@ use crossterm::event::Event::Key;
 use crossterm::event::KeyCode::Char;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tonic::Streaming;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
@@ -24,12 +24,12 @@ pub enum Mode {
 
 pub struct AppState {
     tx_server: UnboundedSender<Signal>,
-    rx_server: Streaming<Signal>,
+    rx_server: UnboundedReceiver<Signal>,
     tx_sound: UnboundedSender<bool>,
     tx_letter: UnboundedSender<Letter>,
     // millis
     tick_rate: i32,
-
+    precision: f64,
     time_unit: i32,
 
     homepage: HomeComponent,
@@ -48,10 +48,11 @@ impl AppState {
     pub fn new(
         tick_rate: i32,
         time_unit: i32,
+        precision: f64,
         tx_sound: UnboundedSender<bool>,
         tx_server: UnboundedSender<Signal>,
         tx_letter: UnboundedSender<Letter>,
-        rx_server: Streaming<Signal>,
+        rx_server: UnboundedReceiver<Signal>,
     ) -> AppState {
         AppState {
             tx_server,
@@ -68,6 +69,7 @@ impl AppState {
             should_quit: false,
             time_unit,
             mode: Mode::Normal,
+            precision,
         }
     }
 
@@ -177,6 +179,10 @@ impl AppState {
             },
         }
     }
+
+    pub fn add_letter(&mut self, letter: Letter) {
+        self.trans.add_translated(letter);
+    }
     pub fn should_quit(&self) -> bool {
         self.should_quit
     }
@@ -184,7 +190,7 @@ impl AppState {
     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
         &self.tx_server
     }
-    pub fn rx_server(&mut self) -> &mut Streaming<Signal> {
+    pub fn rx_server(&mut self) -> &mut UnboundedReceiver<Signal> {
         &mut self.rx_server
     }
     pub fn time_unit(&self) -> i32 {
@@ -192,5 +198,8 @@ impl AppState {
     }
     pub fn time_unit_d(&self) -> Duration {
         Duration::from_millis(self.time_unit as u64)
+    }
+    pub fn precision(&self) -> f64 {
+        self.precision
     }
 }

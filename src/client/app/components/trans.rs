@@ -52,7 +52,7 @@ impl TransComponent {
         self.draw_to_send(f, left_chunks[0]);
     }
 
-    pub fn add_translated(&mut self, letter: &Letter) {
+    pub fn add_translated(&mut self, letter: Letter) {
         let letter: char = letter.into();
         self.received.push(letter);
     }

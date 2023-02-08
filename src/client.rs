@@ -1,6 +1,6 @@
 use crate::client::app::AppState;
 use crate::client::events::{select_event, ticker, AppEvent};
-use crate::client::morse::letter_transmitter;
+use crate::client::morse::{letter_receiver, letter_transmitter};
 use crate::client::sound::{setup_sink, singer};
 use crate::morser::messenger_client::MessengerClient;
 use crate::morser::Signal;
@@ -134,7 +134,7 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
 async fn run_app<B: Backend>(
     terminal: &mut Terminal<B>,
     to_server: UnboundedSender<Signal>,
-    from_server: Streaming<Signal>,
+    mut from_server: Streaming<Signal>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut reader = EventStream::new();
     let (tx_r, mut rx_r) = mpsc::unbounded_channel();
@@ -142,15 +142,34 @@ async fn run_app<B: Backend>(
     let (tx_s, rx_s) = mpsc::unbounded_channel();
     let (tx_l, rx_l) = mpsc::unbounded_channel();
     let (tx_c, mut rx_c) = mpsc::unbounded_channel();
+    let (tx_sl, mut rx_sl) = mpsc::unbounded_channel();
+    let (tx_server1, rx_server1) = mpsc::unbounded_channel();
+    let (tx_server2, rx_server2) = mpsc::unbounded_channel();
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
-    let mut app = AppState::new(100, 100, tx_s, to_server.clone(), tx_l, from_server);
+    let mut app = AppState::new(100, 200, 0.5, tx_s, to_server.clone(), tx_l, rx_server1);
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
     tokio::spawn(singer(rx_s, sink));
     tokio::spawn(letter_transmitter(rx_l, to_server, tx_c, app.time_unit_d()));
+    tokio::spawn(async move {
+        while let Some(Ok(signal)) = from_server.next().await {
+            tx_server1
+                .send(signal.clone())
+                .expect("Couldn't duplicate signal");
+            tx_server2
+                .send(signal.clone())
+                .expect("Coudln't duplicete signal");
+        }
+    });
+    tokio::spawn(letter_receiver(
+        rx_server2,
+        tx_sl,
+        app.time_unit_d(),
+        app.precision(),
+    ));
 
     loop {
         let event = select_event(
@@ -159,6 +178,7 @@ async fn run_app<B: Backend>(
             &mut rx_r,
             app.rx_server(),
             &mut rx_c,
+            &mut rx_sl,
         )
         .await;
 
@@ -171,6 +191,7 @@ async fn run_app<B: Backend>(
             AppEvent::SysSigOn => app.signal_on(),
             AppEvent::Server(signal) => app.set_signal(signal.state),
             AppEvent::CountWord => app.count_word(),
+            AppEvent::AddLetter(letter) => app.add_letter(letter),
         }
 
         if app.should_quit() {

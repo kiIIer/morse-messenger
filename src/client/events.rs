@@ -1,4 +1,5 @@
 use crate::client::events::AppEvent::Tick;
+use crate::client::morse::Letter;
 use crate::morser::Signal;
 use crossterm::event::{Event as CEvent, EventStream};
 use futures::FutureExt;
@@ -17,14 +18,16 @@ pub enum AppEvent {
     SysSigOff,
     Server(Signal),
     CountWord,
+    AddLetter(Letter),
 }
 
 pub async fn select_event(
     rx_t: &mut UnboundedReceiver<AppEvent>,
     reader: &mut EventStream,
     rx_r: &mut UnboundedReceiver<AppEvent>,
-    rx_s: &mut Streaming<Signal>,
+    rx_s: &mut UnboundedReceiver<Signal>,
     rx_c: &mut UnboundedReceiver<()>,
+    rx_l: &mut UnboundedReceiver<Letter>,
 ) -> AppEvent {
     if let Ok(_) = rx_t.try_recv() {
         return Tick;
@@ -39,12 +42,14 @@ pub async fn select_event(
         Some(event) = rx_r.recv() => {
             return event;
         }
-        // TODO: Handle err
-        Some(Ok(signal)) = rx_s.next() => {
+        Some(signal) = rx_s.recv() => {
             return AppEvent::Server(signal);
         }
         Some(_) = rx_c.recv() => {
             return AppEvent::CountWord
+        }
+        Some(letter) = rx_l.recv() => {
+            return AppEvent::AddLetter(letter);
         }
     }
 }
