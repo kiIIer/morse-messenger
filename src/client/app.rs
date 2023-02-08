@@ -97,7 +97,7 @@ impl AppState {
             MenuItem::Home => self.homepage.draw(f, chunks_main[1]),
             MenuItem::Signal => self.signal.draw(f, chunks_main[1]),
             MenuItem::Cheat => self.cheatsheet.draw(f, chunks_main[1], &self.signal),
-            MenuItem::Trans => self.trans.draw(f, chunks_main[1]),
+            MenuItem::Trans => self.trans.draw(f, chunks_main[1], &self.signal),
         }
     }
 
