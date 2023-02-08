@@ -13,7 +13,7 @@ pub enum Morse {
     None,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Letter {
     A,
     B,
@@ -203,6 +203,7 @@ pub async fn morse_transmitter(tx: UnboundedSender<Signal>, time_unit: Duration,
 pub async fn letter_transmitter(
     mut rx: UnboundedReceiver<Letter>,
     tx: UnboundedSender<Signal>,
+    tx_counter: UnboundedSender<()>,
     time_unit: Duration,
 ) {
     while let Some(letter) = rx.recv().await {
@@ -212,6 +213,8 @@ pub async fn letter_transmitter(
         }
 
         Delay::new(time_unit * 3).fuse().await;
+
+        tx_counter.send(()).expect("Couldn't count");
     }
 }
 

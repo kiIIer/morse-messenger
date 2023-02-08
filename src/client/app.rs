@@ -84,6 +84,10 @@ impl AppState {
         self.signal.signal()
     }
 
+    pub fn count_word(&mut self) {
+        self.trans.count_word();
+    }
+
     pub fn signal_on(&mut self) {
         if let Mode::Normal = self.mode {
             self.tx_server

@@ -141,6 +141,7 @@ async fn run_app<B: Backend>(
     let (tx_t, mut rx_t) = mpsc::unbounded_channel();
     let (tx_s, rx_s) = mpsc::unbounded_channel();
     let (tx_l, rx_l) = mpsc::unbounded_channel();
+    let (tx_c, mut rx_c) = mpsc::unbounded_channel();
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
@@ -149,10 +150,17 @@ async fn run_app<B: Backend>(
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
     tokio::spawn(singer(rx_s, sink));
-    tokio::spawn(letter_transmitter(rx_l, to_server, app.time_unit_d()));
+    tokio::spawn(letter_transmitter(rx_l, to_server, tx_c, app.time_unit_d()));
 
     loop {
-        let event = select_event(&mut rx_t, &mut reader, &mut rx_r, app.rx_server()).await;
+        let event = select_event(
+            &mut rx_t,
+            &mut reader,
+            &mut rx_r,
+            app.rx_server(),
+            &mut rx_c,
+        )
+        .await;
 
         match event {
             AppEvent::Tick => {
@@ -162,6 +170,7 @@ async fn run_app<B: Backend>(
             AppEvent::SysSigOff => app.signal_off(),
             AppEvent::SysSigOn => app.signal_on(),
             AppEvent::Server(signal) => app.set_signal(signal.state),
+            AppEvent::CountWord => app.count_word(),
         }
 
         if app.should_quit() {

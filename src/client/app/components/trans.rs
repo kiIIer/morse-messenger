@@ -65,12 +65,21 @@ impl TransComponent {
         self.to_send.pop();
     }
 
+    pub fn count_word(&mut self) {
+        self.sent += 1;
+    }
+
     pub fn pending_add(&mut self) -> Vec<Letter> {
-        let to_send: Vec<Letter> = self.to_send.drain(0..self.to_send.len()).collect();
+        let mut to_send: Vec<Letter> = self.to_send.drain(0..self.to_send.len()).collect();
         let mut sending_string = String::new();
 
         for letter in to_send.iter() {
             sending_string.push(char::from(letter));
+        }
+
+        if !to_send.is_empty() && to_send[to_send.len() - 1] != Letter::Space {
+            to_send.push(Letter::Space);
+            sending_string.push(' ');
         }
 
         self.sending.push_str(sending_string.as_str());
@@ -109,6 +118,7 @@ impl TransComponent {
         {
             scroll += 1;
         }
+
         let (sent, pending) = self.sending.split_at(self.sent);
         let sending = Paragraph::new(vec![Spans::from(vec![
             Span::styled(sent, Style::default().fg(Color::DarkGray)),

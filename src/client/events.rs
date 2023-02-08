@@ -3,7 +3,6 @@ use crate::morser::Signal;
 use crossterm::event::{Event as CEvent, EventStream};
 use futures::FutureExt;
 use futures_timer::Delay;
-use rdev::Event as REvent;
 use std::time::Duration;
 use tokio::select;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -17,6 +16,7 @@ pub enum AppEvent {
     SysSigOn,
     SysSigOff,
     Server(Signal),
+    CountWord,
 }
 
 pub async fn select_event(
@@ -24,6 +24,7 @@ pub async fn select_event(
     reader: &mut EventStream,
     rx_r: &mut UnboundedReceiver<AppEvent>,
     rx_s: &mut Streaming<Signal>,
+    rx_c: &mut UnboundedReceiver<()>,
 ) -> AppEvent {
     if let Ok(_) = rx_t.try_recv() {
         return Tick;
@@ -41,6 +42,9 @@ pub async fn select_event(
         // TODO: Handle err
         Some(Ok(signal)) = rx_s.next() => {
             return AppEvent::Server(signal);
+        }
+        Some(_) = rx_c.recv() => {
+            return AppEvent::CountWord
         }
     }
 }
