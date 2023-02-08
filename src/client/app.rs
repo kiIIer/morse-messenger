@@ -3,6 +3,7 @@ use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use crate::client::app::components::trans::TransComponent;
+use crate::client::morse::Morse;
 use crate::morser::Signal;
 use crossterm::event::Event::Key;
 use crossterm::event::{Event as CEvent, KeyCode};
@@ -15,9 +16,20 @@ use tui::Frame;
 
 mod components;
 
+enum Mode {
+    Input,
+    Normal,
+}
+
 pub struct AppState {
     tx_server: UnboundedSender<Signal>,
     rx_server: Streaming<Signal>,
+    tx_sound: UnboundedSender<bool>,
+    tx_morse: UnboundedSender<Morse>,
+    // millis
+    tick_rate: i32,
+
+    time_unit: i32,
 
     homepage: HomeComponent,
     cheatsheet: CheatComponent,
@@ -26,25 +38,24 @@ pub struct AppState {
     tab: TabsComponent,
 
     active_tab: MenuItem,
+    mode: Mode,
 
     should_quit: bool,
-
-    tx_sound: UnboundedSender<bool>,
-
-    // millis
-    tick_rate: i32,
 }
 
 impl AppState {
     pub fn new(
         tick_rate: i32,
+        time_unit: i32,
         tx_sound: UnboundedSender<bool>,
         tx_server: UnboundedSender<Signal>,
+        tx_morse: UnboundedSender<Morse>,
         rx_server: Streaming<Signal>,
     ) -> AppState {
         AppState {
             tx_server,
             rx_server,
+            tx_morse,
             homepage: Default::default(),
             cheatsheet: Default::default(),
             signal: Default::default(),
@@ -54,6 +65,8 @@ impl AppState {
             tick_rate,
             tx_sound,
             should_quit: false,
+            time_unit,
+            mode: Normal,
         }
     }
 
@@ -110,16 +123,26 @@ impl AppState {
     }
 
     pub fn handle_c_event(&mut self, event: CEvent) {
-        match event {
-            Key(key) => match key.code {
-                KeyCode::Char('q') => self.should_quit = true,
-                KeyCode::Char('0') => self.active_tab = MenuItem::Home,
-                KeyCode::Char('1') => self.active_tab = MenuItem::Signal,
-                KeyCode::Char('2') => self.active_tab = MenuItem::Cheat,
-                KeyCode::Char('3') => self.active_tab = MenuItem::Trans,
+        match self.mode {
+            Mode::Normal => match event {
+                Key(key) => match key.code {
+                    KeyCode::Char('q') => self.should_quit = true,
+                    KeyCode::Char('0') => self.active_tab = MenuItem::Home,
+                    KeyCode::Char('1') => self.active_tab = MenuItem::Signal,
+                    KeyCode::Char('2') => self.active_tab = MenuItem::Cheat,
+                    KeyCode::Char('3') => self.active_tab = MenuItem::Trans,
+                    _ => {}
+                },
                 _ => {}
             },
-            _ => {}
+
+            Mode::Input => match event {
+                Key(key) => match key.code{
+                    KeyCode::
+                    _ => {}
+                }
+                _ => {}
+            },
         }
     }
     pub fn should_quit(&self) -> bool {
@@ -131,5 +154,11 @@ impl AppState {
     }
     pub fn rx_server(&mut self) -> &mut Streaming<Signal> {
         &mut self.rx_server
+    }
+    pub fn time_unit(&self) -> i32 {
+        self.time_unit
+    }
+    pub fn time_unit_d(&self) -> Duration {
+        Duration::from_millis(self.time_unit as u64)
     }
 }

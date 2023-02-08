@@ -3,13 +3,14 @@ use futures::FutureExt;
 use futures_timer::Delay;
 use std::time::Duration;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use tokio::time::MissedTickBehavior::Delay;
 use Morse::{Dah, Dit, Space};
 
+#[derive(Debug)]
 pub enum Morse {
     Dit,
     Dah,
     Space,
+    None,
 }
 
 pub enum Letter {
@@ -50,6 +51,7 @@ pub enum Letter {
     N8,
     N9,
     Space,
+    None,
 }
 
 impl From<Morse> for char {
@@ -65,6 +67,7 @@ impl From<&Morse> for char {
             Dit => '•',
             Dah => '—',
             Space => ' ',
+            None => '?',
         }
     }
 }
@@ -109,6 +112,7 @@ impl From<&Letter> for Vec<Morse> {
             Letter::N8 => vec![Dah, Dah, Dah, Dit, Dit],
             Letter::N9 => vec![Dah, Dah, Dah, Dah, Dit],
             Letter::Space => vec![Space],
+            Letter::None => vec![Morse::None],
         }
     }
 }
@@ -153,6 +157,7 @@ impl From<&Letter> for char {
             Letter::N8 => '8',
             Letter::N9 => '9',
             Letter::Space => ' ',
+            Letter::None => '?',
         }
     }
 }
@@ -188,6 +193,7 @@ pub async fn morse_transmitter(
             Space => {
                 Delay::new(time_unit).fuse().await;
             }
+            Morse::None => continue,
         }
         Delay::new(time_unit * 3).fuse().await;
     }
