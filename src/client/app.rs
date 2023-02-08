@@ -131,12 +131,12 @@ impl AppState {
         match self.mode {
             Mode::Normal => match event {
                 Key(key) => match key.code {
-                    KeyCode::Char('q') => self.should_quit = true,
-                    KeyCode::Char('e') => self.mode = Mode::Input,
-                    KeyCode::Char('0') => self.active_tab = MenuItem::Home,
-                    KeyCode::Char('1') => self.active_tab = MenuItem::Signal,
-                    KeyCode::Char('2') => self.active_tab = MenuItem::Cheat,
-                    KeyCode::Char('3') => self.active_tab = MenuItem::Trans,
+                    Char('q') => self.should_quit = true,
+                    Char('e') => self.mode = Mode::Input,
+                    Char('0') => self.active_tab = MenuItem::Home,
+                    Char('1') => self.active_tab = MenuItem::Signal,
+                    Char('2') => self.active_tab = MenuItem::Cheat,
+                    Char('3') => self.active_tab = MenuItem::Trans,
                     _ => {}
                 },
                 _ => {}
