@@ -1,11 +1,15 @@
+use crate::client::morse::MorseDelay::Letter;
 use crate::morser::Signal;
 use futures::FutureExt;
+use futures_core::Stream;
 use futures_timer::Delay;
-use std::time::Duration;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use std::time::{Duration, Instant};
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+use tokio_stream::StreamExt;
+use tonic::Streaming;
 use Morse::{Dah, Dit, Space};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Morse {
     Dit,
     Dah,
@@ -71,6 +75,139 @@ impl From<&Morse> for char {
             Morse::None => '?',
         }
     }
+}
+
+impl From<Vec<Morse>> for Letter {
+    fn from(value: Vec<Morse>) -> Self {
+        if value.len() == 0 || value.len() > 5 {
+            return Letter::None;
+        }
+
+        if compare(&value, &vec![Dit, Dah]) {
+            return Letter::A;
+        }
+        if compare(&value, &vec![Dah, Dit, Dit, Dit]) {
+            return Letter::B;
+        }
+        if compare(&value, &vec![Dah, Dit, Dah, Dit]) {
+            return Letter::C;
+        }
+        if compare(&value, &vec![Dah, Dit, Dit]) {
+            return Letter::D;
+        }
+        if compare(&value, &vec![Dit]) {
+            return Letter::E;
+        }
+        if compare(&value, &vec![Dit, Dit, Dah, Dit]) {
+            return Letter::F;
+        }
+        if compare(&value, &vec![Dah, Dah, Dit]) {
+            return Letter::G;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit, Dit]) {
+            return Letter::H;
+        }
+        if compare(&value, &vec![Dit, Dit]) {
+            return Letter::I;
+        }
+        if compare(&value, &vec![Dit, Dah, Dah, Dah]) {
+            return Letter::J;
+        }
+        if compare(&value, &vec![Dah, Dit, Dah]) {
+            return Letter::K;
+        }
+        if compare(&value, &vec![Dit, Dah, Dit, Dit]) {
+            return Letter::L;
+        }
+        if compare(&value, &vec![Dah, Dah]) {
+            return Letter::M;
+        }
+        if compare(&value, &vec![Dah, Dit]) {
+            return Letter::N;
+        }
+        if compare(&value, &vec![Dah, Dah, Dah]) {
+            return Letter::O;
+        }
+        if compare(&value, &vec![Dit, Dah, Dah, Dit]) {
+            return Letter::P;
+        }
+        if compare(&value, &vec![Dah, Dah, Dit, Dah]) {
+            return Letter::Q;
+        }
+        if compare(&value, &vec![Dit, Dah, Dit]) {
+            return Letter::R;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit]) {
+            return Letter::S;
+        }
+        if compare(&value, &vec![Dah]) {
+            return Letter::T;
+        }
+        if compare(&value, &vec![Dit, Dit, Dah]) {
+            return Letter::U;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit, Dah]) {
+            return Letter::V;
+        }
+        if compare(&value, &vec![Dit, Dah, Dah]) {
+            return Letter::W;
+        }
+        if compare(&value, &vec![Dah, Dit, Dit, Dah]) {
+            return Letter::X;
+        }
+        if compare(&value, &vec![Dah, Dit, Dah, Dah]) {
+            return Letter::Y;
+        }
+        if compare(&value, &vec![Dah, Dah, Dit, Dit]) {
+            return Letter::Z;
+        }
+        if compare(&value, &vec![Dah, Dah, Dah, Dah, Dah]) {
+            return Letter::N0;
+        }
+        if compare(&value, &vec![Dit, Dah, Dah, Dah, Dah]) {
+            return Letter::N1;
+        }
+        if compare(&value, &vec![Dit, Dit, Dah, Dah, Dah]) {
+            return Letter::N2;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit, Dah, Dah]) {
+            return Letter::N3;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit, Dit, Dah]) {
+            return Letter::N4;
+        }
+        if compare(&value, &vec![Dit, Dit, Dit, Dit, Dit]) {
+            return Letter::N5;
+        }
+        if compare(&value, &vec![Dah, Dit, Dit, Dit, Dit]) {
+            return Letter::N6;
+        }
+        if compare(&value, &vec![Dah, Dah, Dit, Dit, Dit]) {
+            return Letter::N7;
+        }
+        if compare(&value, &vec![Dah, Dah, Dah, Dit, Dit]) {
+            return Letter::N8;
+        }
+        if compare(&value, &vec![Dah, Dah, Dah, Dah, Dit]) {
+            return Letter::N9;
+        }
+
+        Letter::None
+    }
+}
+
+fn compare(v1: &Vec<Morse>, v2: &Vec<Morse>) -> bool {
+    if v1.len() != v2.len() {
+        return false;
+    }
+
+    for i in 0..v1.len() {
+        if v1[i] != v2[i] {
+            return false;
+        }
+    }
+
+    true
 }
 
 impl From<&Letter> for Vec<Morse> {
@@ -215,6 +352,122 @@ pub async fn letter_transmitter(
         Delay::new(time_unit * 3).fuse().await;
 
         tx_counter.send(()).expect("Couldn't count");
+    }
+}
+
+#[derive(Debug)]
+enum MorseDelay {
+    Letter,
+    Word,
+}
+
+#[derive(Debug)]
+enum MorseSignal {
+    Off(MorseDelay),
+    On(Morse),
+}
+
+async fn morse_receiver(
+    mut signal_in: Streaming<Signal>,
+    tx_morse: UnboundedSender<MorseSignal>,
+    time_unit: Duration,
+    precision: f64,
+) {
+    let mut last = (false, Instant::now());
+    while let Some(signal) = signal_in.next().await {
+        //     TODO: handle error
+        let current = signal.expect("Error from server");
+        let now = Instant::now();
+
+        if last.0 == current.state {
+            continue;
+        }
+
+        last = (current.state, now);
+
+        let duration = last.1.elapsed();
+
+        let ratio = duration.as_micros() as f64 / time_unit.as_micros() as f64;
+
+        if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
+            if current.state {
+                tx_morse
+                    .send(MorseSignal::Off(MorseDelay::Letter))
+                    .expect("Wtf happened?");
+                continue;
+            }
+            {
+                tx_morse
+                    .send(MorseSignal::On(Morse::Dit))
+                    .expect("This will work");
+                continue;
+            }
+        }
+
+        let ratio = ratio * 3.0;
+
+        if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
+            if current.state {
+                tx_morse
+                    .send(MorseSignal::Off(MorseDelay::Word))
+                    .expect("This will");
+                continue;
+            } else {
+                tx_morse.send(MorseSignal::On(Morse::Dah)).expect("WORK");
+                continue;
+            }
+        }
+
+        let ratio = ratio * 2.33;
+
+        if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
+            if current.state {
+                tx_morse.send(MorseSignal::On(Morse::Space)).expect("Smth");
+                continue;
+            }
+        }
+
+        tx_morse.send(MorseSignal::On(Morse::None)).expect("Idk");
+    }
+}
+
+pub async fn letter_receiver(
+    signal_in: Streaming<Signal>,
+    tx_l: UnboundedSender<Letter>,
+    time_unit: Duration,
+    precision: f64,
+) {
+    let mut buffer = Vec::new();
+
+    let (tx, mut rx) = unbounded_channel();
+    tokio::spawn(morse_receiver(signal_in, tx, time_unit, precision));
+
+    while let Some(morse_signal) = rx.recv().await {
+        match morse_signal {
+            MorseSignal::Off(delay) => match delay {
+                MorseDelay::Letter => {}
+                MorseDelay::Word => {
+                    let try_letter: Vec<Morse> = buffer.drain(0..buffer.len()).collect();
+                    let letter = Letter::from(try_letter);
+                    tx_l.send(letter).expect("Couldn't send letter");
+                }
+            },
+            MorseSignal::On(morse) => match morse {
+                Morse::None => {
+                    buffer.clear();
+                    tx_l.send(Letter::None).expect("Couldn't send letter");
+                }
+                Dah => {
+                    buffer.push(Dah);
+                }
+                Dit => {
+                    buffer.push(Dit);
+                }
+                Space => {
+                    tx_l.send(Letter::Space).expect("Couldn't send letter");
+                }
+            },
+        }
     }
 }
 
