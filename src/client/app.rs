@@ -154,6 +154,9 @@ impl AppState {
                 Key(key) => match key.code {
                     KeyCode::Esc => self.mode = Mode::Normal,
                     KeyCode::Backspace => self.pop_to_send(),
+                    KeyCode::Enter => {
+                        self.trans.pending_add();
+                    }
                     Char(symbol) => {
                         if let Some(letter) = convert(symbol) {
                             self.add_to_send(letter)

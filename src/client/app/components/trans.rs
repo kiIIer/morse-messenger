@@ -65,6 +65,19 @@ impl TransComponent {
         self.to_send.pop();
     }
 
+    pub fn pending_add(&mut self) -> Vec<Letter> {
+        let to_send: Vec<Letter> = self.to_send.drain(0..self.to_send.len()).collect();
+        let mut sending_string = String::new();
+
+        for letter in to_send.iter() {
+            sending_string.push(char::from(letter));
+        }
+
+        self.sending.push_str(sending_string.as_str());
+
+        to_send
+    }
+
     fn draw_receiving<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {
         let max_line_len = area.width - 2;
         let max_lines = area.height - 2;
@@ -86,13 +99,24 @@ impl TransComponent {
     }
 
     fn draw_sending<B: Backend>(&self, f: &mut Frame<B>, area: Rect) {
-        let (pending, sent) = self.sending.split_at(self.sent);
+        let max_line_len = area.width - 2;
+        let max_lines = area.height - 2;
+        let max_mes_len = max_line_len * max_lines;
+        let mut scroll = 0;
+
+        while (self.sending.len() as u16 - (scroll * max_line_len)) as f64 / max_mes_len as f64
+            > 0.75
+        {
+            scroll += 1;
+        }
+        let (sent, pending) = self.sending.split_at(self.sent);
         let sending = Paragraph::new(vec![Spans::from(vec![
-            Span::styled(pending, Style::default()),
             Span::styled(sent, Style::default().fg(Color::DarkGray)),
+            Span::styled(pending, Style::default()),
         ])])
         .block(Block::default().title("Sending...").borders(Borders::ALL))
-        .wrap(Wrap { trim: true });
+        .wrap(Wrap { trim: true })
+        .scroll((scroll, 0));
 
         f.render_widget(sending, area);
     }

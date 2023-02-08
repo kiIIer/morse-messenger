@@ -118,6 +118,12 @@ impl From<&Letter> for Vec<Morse> {
     }
 }
 
+impl From<Letter> for char {
+    fn from(value: Letter) -> Self {
+        (&value).into()
+    }
+}
+
 impl From<&Letter> for char {
     fn from(value: &Letter) -> Self {
         match value {
