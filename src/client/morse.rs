@@ -13,6 +13,7 @@ pub enum Morse {
     None,
 }
 
+#[derive(Debug)]
 pub enum Letter {
     A,
     B,
@@ -67,7 +68,7 @@ impl From<&Morse> for char {
             Dit => '•',
             Dah => '—',
             Space => ' ',
-            None => '?',
+            Morse::None => '?',
         }
     }
 }
@@ -162,39 +163,82 @@ impl From<&Letter> for char {
     }
 }
 
-pub async fn morse_transmitter(
-    mut rx: UnboundedReceiver<Morse>,
+pub async fn morse_transmitter(tx: UnboundedSender<Signal>, time_unit: Duration, morse: Morse) {
+    let time_unit = time_unit.clone();
+    match morse {
+        Dit => {
+            tx.send(Signal { state: true })
+                .expect("Couldn't send to server");
+
+            Delay::new(time_unit).fuse().await;
+
+            tx.send(Signal { state: false })
+                .expect("Couldn't send to server");
+        }
+
+        Dah => {
+            tx.send(Signal { state: true })
+                .expect("Couldn't send to server");
+
+            Delay::new(time_unit * 3).fuse().await;
+
+            tx.send(Signal { state: false })
+                .expect("Couldn't send to server");
+        }
+
+        Space => {
+            Delay::new(time_unit).fuse().await;
+        }
+        Morse::None => {}
+    };
+    Delay::new(time_unit).fuse().await;
+}
+
+pub async fn letter_transmitter(
+    mut rx: UnboundedReceiver<Letter>,
     tx: UnboundedSender<Signal>,
     time_unit: Duration,
 ) {
-    let time_unit = time_unit.clone();
-    while let Some(morse) = rx.recv().await {
-        match morse {
-            Dit => {
-                tx.send(Signal { state: true })
-                    .expect("Couldn't send to server");
-
-                Delay::new(time_unit).fuse().await;
-
-                tx.send(Signal { state: false })
-                    .expect("Couldn't send to server");
-            }
-
-            Dah => {
-                tx.send(Signal { state: true })
-                    .expect("Couldn't send to server");
-
-                Delay::new(time_unit * 3).fuse().await;
-
-                tx.send(Signal { state: false })
-                    .expect("Couldn't send to server");
-            }
-
-            Space => {
-                Delay::new(time_unit).fuse().await;
-            }
-            Morse::None => continue,
+    while let Some(letter) = rx.recv().await {
+        let morse_v: Vec<Morse> = (&letter).into();
+        for morse in morse_v {
+            morse_transmitter(tx.clone(), time_unit, morse).await;
         }
+
         Delay::new(time_unit * 3).fuse().await;
+    }
+}
+
+pub fn convert(symbol: char) -> Option<Letter> {
+    let symbol = symbol.to_lowercase().next()?;
+    match symbol {
+        'a' => Some(Letter::A),
+        'b' => Some(Letter::B),
+        'c' => Some(Letter::C),
+        'd' => Some(Letter::D),
+        'e' => Some(Letter::E),
+        'f' => Some(Letter::F),
+        'g' => Some(Letter::G),
+        'h' => Some(Letter::H),
+        'i' => Some(Letter::I),
+        'j' => Some(Letter::J),
+        'k' => Some(Letter::K),
+        'l' => Some(Letter::L),
+        'm' => Some(Letter::M),
+        'n' => Some(Letter::N),
+        'o' => Some(Letter::O),
+        'p' => Some(Letter::P),
+        'q' => Some(Letter::Q),
+        'r' => Some(Letter::R),
+        's' => Some(Letter::S),
+        't' => Some(Letter::T),
+        'u' => Some(Letter::U),
+        'v' => Some(Letter::V),
+        'w' => Some(Letter::W),
+        'x' => Some(Letter::X),
+        'y' => Some(Letter::Y),
+        'z' => Some(Letter::Z),
+        ' ' => Some(Letter::Space),
+        _ => None,
     }
 }

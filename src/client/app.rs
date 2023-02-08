@@ -3,9 +3,10 @@ use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use crate::client::app::components::trans::TransComponent;
-use crate::client::morse::Morse;
+use crate::client::morse::{convert, Letter, Morse};
 use crate::morser::Signal;
 use crossterm::event::Event::Key;
+use crossterm::event::KeyCode::Char;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
@@ -25,7 +26,7 @@ pub struct AppState {
     tx_server: UnboundedSender<Signal>,
     rx_server: Streaming<Signal>,
     tx_sound: UnboundedSender<bool>,
-    tx_morse: UnboundedSender<Morse>,
+    tx_letter: UnboundedSender<Letter>,
     // millis
     tick_rate: i32,
 
@@ -49,13 +50,13 @@ impl AppState {
         time_unit: i32,
         tx_sound: UnboundedSender<bool>,
         tx_server: UnboundedSender<Signal>,
-        tx_morse: UnboundedSender<Morse>,
+        tx_letter: UnboundedSender<Letter>,
         rx_server: Streaming<Signal>,
     ) -> AppState {
         AppState {
             tx_server,
             rx_server,
-            tx_morse,
+            tx_letter,
             homepage: Default::default(),
             cheatsheet: Default::default(),
             signal: Default::default(),
@@ -66,7 +67,7 @@ impl AppState {
             tx_sound,
             should_quit: false,
             time_unit,
-            mode: Normal,
+            mode: Mode::Normal,
         }
     }
 
@@ -84,15 +85,19 @@ impl AppState {
     }
 
     pub fn signal_on(&mut self) {
-        self.tx_server
-            .send(Signal { state: true })
-            .expect("Couldn't send sound");
+        if let Mode::Normal = self.mode {
+            self.tx_server
+                .send(Signal { state: true })
+                .expect("Couldn't send sound");
+        }
     }
 
     pub fn signal_off(&mut self) {
-        self.tx_server
-            .send(Signal { state: false })
-            .expect("Couldn't send sound");
+        if let Mode::Normal = self.mode {
+            self.tx_server
+                .send(Signal { state: false })
+                .expect("Couldn't send sound");
+        }
     }
 
     pub async fn send_signal(state: bool) {}
@@ -127,6 +132,7 @@ impl AppState {
             Mode::Normal => match event {
                 Key(key) => match key.code {
                     KeyCode::Char('q') => self.should_quit = true,
+                    KeyCode::Char('e') => self.mode = Mode::Input,
                     KeyCode::Char('0') => self.active_tab = MenuItem::Home,
                     KeyCode::Char('1') => self.active_tab = MenuItem::Signal,
                     KeyCode::Char('2') => self.active_tab = MenuItem::Cheat,
@@ -137,10 +143,15 @@ impl AppState {
             },
 
             Mode::Input => match event {
-                Key(key) => match key.code{
-                    KeyCode::
+                Key(key) => match key.code {
+                    KeyCode::Esc => self.mode = Mode::Normal,
+                    Char(symbol) => {
+                        if let Some(letter) = convert(symbol) {
+                            self.tx_letter.send(letter).expect("Couldn't send morse");
+                        }
+                    }
                     _ => {}
-                }
+                },
                 _ => {}
             },
         }

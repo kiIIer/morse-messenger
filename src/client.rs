@@ -1,6 +1,6 @@
 use crate::client::app::AppState;
 use crate::client::events::{select_event, ticker, AppEvent};
-use crate::client::morse::morse_transmitter;
+use crate::client::morse::letter_transmitter;
 use crate::client::sound::{setup_sink, singer};
 use crate::morser::messenger_client::MessengerClient;
 use crate::morser::Signal;
@@ -140,16 +140,16 @@ async fn run_app<B: Backend>(
     let (tx_r, mut rx_r) = mpsc::unbounded_channel();
     let (tx_t, mut rx_t) = mpsc::unbounded_channel();
     let (tx_s, rx_s) = mpsc::unbounded_channel();
-    let (tx_morse, rx_morse) = mpsc::unbounded_channel();
+    let (tx_l, rx_l) = mpsc::unbounded_channel();
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
-    let mut app = AppState::new(200, 200, tx_s, to_server.clone(), tx_morse, from_server);
+    let mut app = AppState::new(200, 300, tx_s, to_server.clone(), tx_l, from_server);
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
     tokio::spawn(singer(rx_s, sink));
-    tokio::spawn(morse_transmitter(rx_morse, to_server, app.time_unit_d()));
+    tokio::spawn(letter_transmitter(rx_l, to_server, app.time_unit_d()));
 
     loop {
         let event = select_event(&mut rx_t, &mut reader, &mut rx_r, app.rx_server()).await;
