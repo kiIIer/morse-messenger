@@ -1,0 +1,1587 @@
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+   Compiling morse-messenger v0.1.0 (/Users/killer/proj/Rust/morse-messenger)
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.58s
+     Running `target/debug/client`
+Started system sinal
+(false, Instant { tv_sec: 249841, tv_nsec: 913222666 })
+(true, Instant { tv_sec: 249846, tv_nsec: 394438916 })
+(false, Instant { tv_sec: 249846, tv_nsec: 601579541 })
+(true, Instant { tv_sec: 249846, tv_nsec: 804618375 })
+(false, Instant { tv_sec: 249847, tv_nsec: 11231500 })
+(true, Instant { tv_sec: 249847, tv_nsec: 213570125 })
+(false, Instant { tv_sec: 249847, tv_nsec: 813458000 })
+(true, Instant { tv_sec: 249848, tv_nsec: 19530791 })
+(false, Instant { tv_sec: 249848, tv_nsec: 225714458 })
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+   Compiling morse-messenger v0.1.0 (/Users/killer/proj/Rust/morse-messenger)
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.72s
+     Running `target/debug/client`
+Started system sinal
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/client`
+Started system sinal
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dah)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+     Running `target/debug/client`
+Started system sinal
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+   Compiling morse-messenger v0.1.0 (/Users/killer/proj/Rust/morse-messenger)
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.79s
+     Running `target/debug/client`
+Started system sinal
+Off(Word)
+On(Space)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+Off(Word)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+Off(Word)
+On(None)
+Off(Word)
+On(Space)
+Off(Word)
+On(None)
+On(None)
+On(None)
+Off(Word)
+On(Space)
+Off(Word)
+On(None)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+   Compiling morse-messenger v0.1.0 (/Users/killer/proj/Rust/morse-messenger)
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.28s
+     Running `target/debug/client`
+Started system sinal
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dah)
+On(None)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+On(None)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dah)
+On(None)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+On(None)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 0.13s
+     Running `target/debug/client`
+Started system sinal
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+On(None)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+On(None)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+warning: unused manifest key: target.x86_64-pc-windows-gnu.linker
+   Compiling morse-messenger v0.1.0 (/Users/killer/proj/Rust/morse-messenger)
+warning: unused imports: `DisableMouseCapture`, `EnableMouseCapture`, `Event`, `KeyCode`, `self`
+ --> src/client.rs:8:5
+  |
+8 |     self, DisableMouseCapture, EnableMouseCapture, Event, EventStream, KeyCode,
+  |     ^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^               ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `execute`
+  --> src/client.rs:13:17
+   |
+13 | use crossterm::{execute, ExecutableCommand};
+   |                 ^^^^^^^
+
+warning: unused import: `OutputDevices`
+  --> src/client.rs:16:13
+   |
+16 | use rodio::{OutputDevices, OutputStream, Sink};
+   |             ^^^^^^^^^^^^^
+
+warning: unused imports: `Display`, `Write`
+  --> src/client.rs:17:16
+   |
+17 | use std::fmt::{Display, Write};
+   |                ^^^^^^^  ^^^^^
+
+warning: unused import: `std::sync::mpsc as smpsc`
+  --> src/client.rs:18:5
+   |
+18 | use std::sync::mpsc as smpsc;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::time::Duration`
+  --> src/client.rs:19:5
+   |
+19 | use std::time::Duration;
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncBufReadExt`, `AsyncRead`
+  --> src/client.rs:22:17
+   |
+22 | use tokio::io::{AsyncBufReadExt, AsyncRead};
+   |                 ^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `tokio::join`
+  --> src/client.rs:23:5
+   |
+23 | use tokio::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `Receiver`
+  --> src/client.rs:25:25
+   |
+25 | use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
+   |                         ^^^^^^^^
+
+warning: unused import: `tui::terminal::CompletedFrame`
+  --> src/client.rs:29:5
+   |
+29 | use tui::terminal::CompletedFrame;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Morse`
+ --> src/client/app.rs:6:45
+  |
+6 | use crate::client::morse::{convert, Letter, Morse};
+  |                                             ^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/app.rs:13:5
+   |
+13 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/client/app/components/tabs.rs:2:5
+  |
+2 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+  --> src/client/events.rs:11:5
+   |
+11 | use tonic::Streaming;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `futures_core::Stream`
+ --> src/client/morse.rs:3:5
+  |
+3 | use futures_core::Stream;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tonic::Streaming`
+ --> src/client/morse.rs:8:5
+  |
+8 | use tonic::Streaming;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/app/components/trans.rs:3:5
+  |
+3 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `tokio_stream::StreamExt`
+ --> src/client/morse.rs:7:5
+  |
+7 | use tokio_stream::StreamExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `state`
+   --> src/client/app.rs:109:30
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                              ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: associated function `signal` is never used
+  --> src/client/app.rs:85:12
+   |
+85 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `send_signal` is never used
+   --> src/client/app.rs:109:18
+    |
+109 |     pub async fn send_signal(state: bool) {}
+    |                  ^^^^^^^^^^^
+
+warning: associated function `tick_rate` is never used
+   --> src/client/app.rs:129:12
+    |
+129 |     pub fn tick_rate(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `tx_server` is never used
+   --> src/client/app.rs:190:12
+    |
+190 |     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
+    |            ^^^^^^^^^
+
+warning: associated function `time_unit` is never used
+   --> src/client/app.rs:196:12
+    |
+196 |     pub fn time_unit(&self) -> i32 {
+    |            ^^^^^^^^^
+
+warning: associated function `signal` is never used
+  --> src/client/app/components/signal.rs:87:12
+   |
+87 |     pub fn signal(&self) -> bool {
+   |            ^^^^^^
+
+warning: `morse-messenger` (lib) generated 25 warnings
+    Finished dev [unoptimized + debuginfo] target(s) in 1.24s
+     Running `target/debug/client`
+Started system sinal
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dah)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Dit)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Word)
+On(Dit)
+Off(Word)
+On(Space)
+On(Dah)
+Off(Letter)
+On(Dit)
+Off(Letter)
+On(Dit)

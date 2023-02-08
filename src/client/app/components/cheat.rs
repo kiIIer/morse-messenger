@@ -17,7 +17,7 @@ impl Default for CheatComponent {
         CheatComponent {
             alphabet: vec![
                 A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, N0,
-                N1, N2, N3, N4, N5, N6, N7, N8, N9,
+                N1, N2, N3, N4, N5, N6, N7, N8, N9, Dot
             ],
         }
     }
@@ -27,7 +27,7 @@ impl CheatComponent {
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>, area: Rect, sig: &SignalComponent) {
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Length(15), Constraint::Min(2)].as_ref())
+            .constraints([Constraint::Length(17), Constraint::Min(2)].as_ref())
             .split(area);
 
         let alpha_data: Vec<Row> = self
@@ -61,7 +61,7 @@ impl CheatComponent {
             )
             .header(Row::new(vec![
                 Cell::from(Span::styled(
-                    "Le",
+                    "Char",
                     Style::default().add_modifier(Modifier::BOLD).fg(Color::Red),
                 )),
                 Cell::from(Span::styled(

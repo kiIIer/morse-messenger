@@ -3,11 +3,13 @@ use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use crate::client::app::components::trans::TransComponent;
+use crate::client::morse::{convert, Letter, Morse};
 use crate::morser::Signal;
 use crossterm::event::Event::Key;
+use crossterm::event::KeyCode::Char;
 use crossterm::event::{Event as CEvent, KeyCode};
 use std::time::Duration;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tonic::Streaming;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
@@ -15,9 +17,20 @@ use tui::Frame;
 
 mod components;
 
+pub enum Mode {
+    Input,
+    Normal,
+}
+
 pub struct AppState {
     tx_server: UnboundedSender<Signal>,
-    rx_server: Streaming<Signal>,
+    rx_server: UnboundedReceiver<Signal>,
+    tx_sound: UnboundedSender<bool>,
+    tx_letter: UnboundedSender<Letter>,
+    // millis
+    tick_rate: i32,
+    precision: f64,
+    time_unit: i32,
 
     homepage: HomeComponent,
     cheatsheet: CheatComponent,
@@ -26,25 +39,25 @@ pub struct AppState {
     tab: TabsComponent,
 
     active_tab: MenuItem,
+    mode: Mode,
 
     should_quit: bool,
-
-    tx_sound: UnboundedSender<bool>,
-
-    // millis
-    tick_rate: i32,
 }
 
 impl AppState {
     pub fn new(
         tick_rate: i32,
+        time_unit: i32,
+        precision: f64,
         tx_sound: UnboundedSender<bool>,
         tx_server: UnboundedSender<Signal>,
-        rx_server: Streaming<Signal>,
+        tx_letter: UnboundedSender<Letter>,
+        rx_server: UnboundedReceiver<Signal>,
     ) -> AppState {
         AppState {
             tx_server,
             rx_server,
+            tx_letter,
             homepage: Default::default(),
             cheatsheet: Default::default(),
             signal: Default::default(),
@@ -54,6 +67,9 @@ impl AppState {
             tick_rate,
             tx_sound,
             should_quit: false,
+            time_unit,
+            mode: Mode::Normal,
+            precision,
         }
     }
 
@@ -70,16 +86,24 @@ impl AppState {
         self.signal.signal()
     }
 
+    pub fn count_word(&mut self) {
+        self.trans.count_word();
+    }
+
     pub fn signal_on(&mut self) {
-        self.tx_server
-            .send(Signal { state: true })
-            .expect("Couldn't send sound");
+        if let Mode::Normal = self.mode {
+            self.tx_server
+                .send(Signal { state: true })
+                .expect("Couldn't send sound");
+        }
     }
 
     pub fn signal_off(&mut self) {
-        self.tx_server
-            .send(Signal { state: false })
-            .expect("Couldn't send sound");
+        if let Mode::Normal = self.mode {
+            self.tx_server
+                .send(Signal { state: false })
+                .expect("Couldn't send sound");
+        }
     }
 
     pub async fn send_signal(state: bool) {}
@@ -92,12 +116,13 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(2)].as_ref())
             .split(fsize);
 
-        self.tab.draw(f, chunks_main[0], self.active_tab);
+        self.tab
+            .draw(f, chunks_main[0], self.active_tab, &self.mode);
         match self.active_tab {
             MenuItem::Home => self.homepage.draw(f, chunks_main[1]),
             MenuItem::Signal => self.signal.draw(f, chunks_main[1]),
             MenuItem::Cheat => self.cheatsheet.draw(f, chunks_main[1], &self.signal),
-            MenuItem::Trans => self.trans.draw(f, chunks_main[1]),
+            MenuItem::Trans => self.trans.draw(f, chunks_main[1], &self.signal),
         }
     }
 
@@ -109,18 +134,54 @@ impl AppState {
         Duration::from_millis(self.tick_rate as u64)
     }
 
+    pub fn add_to_send(&mut self, letter: Letter) {
+        self.trans.add_to_send(letter)
+    }
+
+    pub fn pop_to_send(&mut self) {
+        self.trans.pop_to_send()
+    }
+
     pub fn handle_c_event(&mut self, event: CEvent) {
-        match event {
-            Key(key) => match key.code {
-                KeyCode::Char('q') => self.should_quit = true,
-                KeyCode::Char('0') => self.active_tab = MenuItem::Home,
-                KeyCode::Char('1') => self.active_tab = MenuItem::Signal,
-                KeyCode::Char('2') => self.active_tab = MenuItem::Cheat,
-                KeyCode::Char('3') => self.active_tab = MenuItem::Trans,
+        match self.mode {
+            Mode::Normal => match event {
+                Key(key) => match key.code {
+                    Char('q') => self.should_quit = true,
+                    Char('e') => self.mode = Mode::Input,
+                    Char('0') => self.active_tab = MenuItem::Home,
+                    Char('1') => self.active_tab = MenuItem::Signal,
+                    Char('2') => self.active_tab = MenuItem::Cheat,
+                    Char('3') => self.active_tab = MenuItem::Trans,
+                    _ => {}
+                },
                 _ => {}
             },
-            _ => {}
+
+            Mode::Input => match event {
+                Key(key) => match key.code {
+                    KeyCode::Esc => self.mode = Mode::Normal,
+                    KeyCode::Backspace => self.pop_to_send(),
+                    KeyCode::Enter => {
+                        let letters = self.trans.pending_add();
+
+                        for letter in letters {
+                            self.tx_letter.send(letter).expect("Couldn't send letter");
+                        }
+                    }
+                    Char(symbol) => {
+                        if let Some(letter) = convert(symbol) {
+                            self.add_to_send(letter)
+                        }
+                    }
+                    _ => {}
+                },
+                _ => {}
+            },
         }
+    }
+
+    pub fn add_letter(&mut self, letter: Letter) {
+        self.trans.add_translated(letter);
     }
     pub fn should_quit(&self) -> bool {
         self.should_quit
@@ -129,7 +190,16 @@ impl AppState {
     pub fn tx_server(&self) -> &UnboundedSender<Signal> {
         &self.tx_server
     }
-    pub fn rx_server(&mut self) -> &mut Streaming<Signal> {
+    pub fn rx_server(&mut self) -> &mut UnboundedReceiver<Signal> {
         &mut self.rx_server
+    }
+    pub fn time_unit(&self) -> i32 {
+        self.time_unit
+    }
+    pub fn time_unit_d(&self) -> Duration {
+        Duration::from_millis(self.time_unit as u64)
+    }
+    pub fn precision(&self) -> f64 {
+        self.precision
     }
 }
