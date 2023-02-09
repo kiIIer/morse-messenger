@@ -1,11 +1,12 @@
 use crate::client::app::Mode;
-use std::any::Any;
-use tui::backend::Backend;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Paragraph, Tabs};
-use tui::Frame;
+use tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Borders, Paragraph, Tabs},
+    Frame,
+};
 
 #[derive(Copy, Clone)]
 pub enum MenuItem {

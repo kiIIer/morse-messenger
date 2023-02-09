@@ -1,14 +1,16 @@
-use crate::client::events::AppEvent::Tick;
-use crate::client::morse::Letter;
-use crate::morser::Signal;
+use crate::{
+    client::{events::AppEvent::Tick, morse::Letter},
+    morser::Signal,
+};
 use crossterm::event::{Event as CEvent, EventStream};
 use futures::FutureExt;
 use futures_timer::Delay;
 use std::time::Duration;
-use tokio::select;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::{
+    select,
+    sync::mpsc::{UnboundedReceiver, UnboundedSender},
+};
 use tokio_stream::StreamExt;
-use tonic::Streaming;
 
 #[derive(Debug)]
 pub enum AppEvent {

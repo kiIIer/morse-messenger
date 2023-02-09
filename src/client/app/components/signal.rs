@@ -1,9 +1,12 @@
-use tui::backend::Backend;
-use tui::layout::Rect;
-use tui::style::{Color, Modifier, Style};
-use tui::text::Span;
-use tui::widgets::{Axis, Block, Borders, Chart, Dataset};
-use tui::{symbols, Frame};
+use tui::{
+    backend::Backend,
+    layout::Rect,
+    style::{Color, Modifier, Style},
+    text::Span,
+    widgets::{Axis, Block, Borders, Chart, Dataset},
+    symbols,
+    Frame
+};
 
 pub struct SignalComponent {
     signal: bool,

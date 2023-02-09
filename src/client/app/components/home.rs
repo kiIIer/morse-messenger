@@ -1,9 +1,11 @@
-use tui::backend::Backend;
-use tui::layout::{Alignment, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, BorderType, Borders, Paragraph};
-use tui::Frame;
+use tui::{
+    backend::Backend,
+    layout::{Alignment, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, BorderType, Borders, Paragraph},
+    Frame,
+};
 
 pub struct HomeComponent {
     heading: String,
