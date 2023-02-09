@@ -148,7 +148,7 @@ async fn run_app<B: Backend>(
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
-    let mut app = AppState::new(100, 200, 0.5, tx_s, to_server.clone(), tx_l, rx_server1);
+    let mut app = AppState::new(50, 100, 0.25, tx_s, to_server.clone(), tx_l, rx_server1);
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));

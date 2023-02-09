@@ -3,6 +3,7 @@ use futures::FutureExt;
 use futures_core::Stream;
 use futures_timer::Delay;
 use std::time::{Duration, Instant};
+use tokio::select;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_stream::StreamExt;
 use tonic::Streaming;
@@ -354,7 +355,7 @@ pub async fn letter_transmitter(
             morse_transmitter(tx.clone(), time_unit, morse).await;
         }
 
-        Delay::new(time_unit * 3).fuse().await;
+        Delay::new(time_unit * 2).fuse().await;
 
         tx_counter.send(()).expect("Couldn't count");
     }
@@ -372,32 +373,59 @@ enum MorseSignal {
     On(Morse),
 }
 
-async fn morse_receiver(
+async fn signal_receiver(
     mut signal_in: UnboundedReceiver<Signal>,
+    tx_signal: UnboundedSender<(bool, Instant)>,
+) {
+    while let Some(signal) = signal_in.recv().await {
+        tx_signal
+            .send((signal.state, Instant::now()))
+            .expect("This cannot not fail");
+    }
+}
+
+async fn morse_receiver(
+    signal_in: UnboundedReceiver<Signal>,
     tx_morse: UnboundedSender<MorseSignal>,
     time_unit: Duration,
     precision: f64,
 ) {
-    let mut last = (false, Instant::now());
-    while let Some(signal) = signal_in.recv().await {
-        let duration = last.1.elapsed();
-        let current = signal;
-        let now = Instant::now();
+    let (tx_s, mut rx_s) = unbounded_channel();
 
-        if last.0 == current.state {
+    tokio::spawn(signal_receiver(signal_in, tx_s));
+
+    let mut last = (false, Instant::now());
+    loop {
+        let delay = Delay::new(time_unit * 7).fuse();
+
+        select! {
+            _ = delay => {
+                tx_morse.send(MorseSignal::Off(MorseDelay::Word)).expect("Will not fail");
+            }
+
+            state = rx_s.recv() => {
+                if let Some(state) = state{
+
+                       let duration = last.1.elapsed();
+        let current = state.0;
+        let now = state.1;
+
+        if last.0 == current {
             continue;
         }
 
-        last = (current.state, now);
+        last = (current, now);
 
+        // TODO: rename
         let ratio = if duration > time_unit * 7 {
             7.0
         } else {
             duration.as_millis() as f64 / time_unit.as_millis() as f64
         };
 
+        // TODO: rewrite to math like format
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
-            if current.state {
+            if current {
                 tx_morse
                     .send(MorseSignal::Off(MorseDelay::Letter))
                     .expect("Wtf happened?");
@@ -414,7 +442,7 @@ async fn morse_receiver(
         let ratio = ratio / 3.0;
 
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
-            if current.state {
+            if current {
                 tx_morse
                     .send(MorseSignal::Off(MorseDelay::Word))
                     .expect("This will");
@@ -428,7 +456,7 @@ async fn morse_receiver(
         let ratio = ratio / 2.33333;
 
         if ratio < (1.0 + precision) && ratio > (1.0 - precision) {
-            if current.state {
+            if current {
                 tx_morse
                     .send(MorseSignal::Off(MorseDelay::Word))
                     .expect("Fail");
@@ -439,6 +467,10 @@ async fn morse_receiver(
         }
 
         tx_morse.send(MorseSignal::On(Morse::None)).expect("Idk");
+
+                }
+            }
+        }
     }
 }
 
@@ -458,6 +490,9 @@ pub async fn letter_receiver(
             MorseSignal::Off(delay) => match delay {
                 MorseDelay::Letter => {}
                 MorseDelay::Word => {
+                    if buffer.is_empty() {
+                        continue;
+                    }
                     let try_letter: Vec<Morse> = buffer.drain(0..buffer.len()).collect();
                     let letter = Letter::from(try_letter);
                     tx_l.send(letter).expect("Couldn't send letter");
