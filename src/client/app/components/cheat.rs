@@ -1,12 +1,15 @@
-use crate::client::app::components::signal::SignalComponent;
-use crate::client::morse::Letter::*;
-use crate::client::morse::{Letter, Morse};
-use tui::backend::Backend;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::Span;
-use tui::widgets::{Block, Borders, Cell, Row, Table};
-use tui::Frame;
+use crate::client::{
+    app::components::signal::SignalComponent,
+    morse::{Letter, Letter::*, Morse},
+};
+use tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::Span,
+    widgets::{Block, Borders, Cell, Row, Table},
+    Frame,
+};
 
 pub struct CheatComponent {
     alphabet: Vec<Letter>,

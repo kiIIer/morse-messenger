@@ -1,7 +1,7 @@
-use crate::morser::messenger_server::MessengerServer;
-use crate::server::my_messenger_server::MyMessengerServer;
-use std::env;
-use std::net::ToSocketAddrs;
+use crate::{
+    morser::messenger_server::MessengerServer, server::my_messenger_server::MyMessengerServer,
+};
+use std::{env, net::ToSocketAddrs};
 use tonic::transport::Server;
 
 mod my_messenger_server;

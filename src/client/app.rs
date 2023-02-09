@@ -1,18 +1,24 @@
-use crate::client::app::components::cheat::CheatComponent;
-use crate::client::app::components::home::HomeComponent;
-use crate::client::app::components::signal::SignalComponent;
-use crate::client::app::components::tabs::{MenuItem, TabsComponent};
-use crate::client::app::components::trans::TransComponent;
-use crate::client::morse::{convert, Letter};
-use crate::morser::Signal;
-use crossterm::event::Event::Key;
-use crossterm::event::KeyCode::Char;
-use crossterm::event::{Event as CEvent, KeyCode, KeyEventKind};
+use crate::{
+    client::{
+        app::components::{
+            cheat::CheatComponent,
+            home::HomeComponent,
+            signal::SignalComponent,
+            tabs::{MenuItem, TabsComponent},
+            trans::TransComponent,
+        },
+        morse::{convert, Letter},
+    },
+    morser::Signal,
+};
+use crossterm::event::{Event as CEvent, Event::Key, KeyCode, KeyCode::Char, KeyEventKind};
 use std::time::Duration;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use tui::backend::Backend;
-use tui::layout::{Constraint, Direction, Layout};
-use tui::Frame;
+use tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout},
+    Frame,
+};
 
 mod components;
 

@@ -1,11 +1,12 @@
-use crate::client::app::components::signal::SignalComponent;
-use crate::client::morse::Letter;
-use tui::backend::Backend;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Paragraph, Wrap};
-use tui::Frame;
+use crate::{client::app::components::signal::SignalComponent, client::morse::Letter};
+use tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Style},
+    text::{Span, Spans},
+    widgets::{Block, Borders, Paragraph, Wrap},
+    Frame,
+};
 
 pub struct TransComponent {
     received: String,

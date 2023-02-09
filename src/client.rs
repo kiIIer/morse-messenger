@@ -1,24 +1,26 @@
-use crate::client::app::AppState;
-use crate::client::events::{select_event, ticker, AppEvent};
-use crate::client::morse::{letter_receiver, letter_transmitter};
-use crate::client::sound::{setup_sink, singer};
-use crate::morser::messenger_client::MessengerClient;
-use crate::morser::Signal;
-use crossterm::event::EventStream;
-use crossterm::terminal::{
-    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+use crate::{
+    client::{
+        app::AppState,
+        events::{select_event, ticker, AppEvent},
+        morse::{letter_receiver, letter_transmitter},
+        sound::{setup_sink, singer},
+    },
+    morser::{messenger_client::MessengerClient, Signal},
 };
-use crossterm::ExecutableCommand;
+use crossterm::{
+    event::EventStream,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    ExecutableCommand,
+};
 use rdev::{listen, Event as REvent, EventType, Key};
 use std::{env, process};
-use tokio::io;
-use tokio::sync::mpsc;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::{io, sync::mpsc, sync::mpsc::UnboundedSender};
 use tokio_stream::{wrappers, StreamExt};
-use tonic::transport::Uri;
-use tonic::Streaming;
-use tui::backend::{Backend, CrosstermBackend};
-use tui::Terminal;
+use tonic::{transport::Uri, Streaming};
+use tui::{
+    backend::{Backend, CrosstermBackend},
+    Terminal,
+};
 
 mod app;
 mod events;
