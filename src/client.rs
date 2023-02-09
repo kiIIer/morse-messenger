@@ -17,13 +17,14 @@ use rodio::{OutputDevices, OutputStream, Sink};
 use std::fmt::{Display, Write};
 use std::sync::mpsc as smpsc;
 use std::time::Duration;
-use std::{process, thread};
+use std::{env, process, thread};
 use tokio::io;
 use tokio::io::{AsyncBufReadExt, AsyncRead};
 use tokio::join;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{Receiver, Sender, UnboundedReceiver, UnboundedSender};
 use tokio_stream::{wrappers, StreamExt};
+use tonic::transport::Uri;
 use tonic::Streaming;
 use tui::backend::{Backend, CrosstermBackend};
 use tui::terminal::CompletedFrame;
@@ -111,9 +112,27 @@ pub async fn execute1() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = MessengerClient::connect("http://192.168.1.41:50051")
-        .await
-        .expect("Couldn't connect");
+    let mut args: Vec<String> = env::args().collect();
+
+    if args.len() < 5 {
+        args = vec![
+            "smth".to_string(),
+            "50".to_string(),
+            "100".to_string(),
+            "0.25".to_string(),
+            "http://192.168.1.41:50051".to_string(),
+        ]
+    }
+
+    let tick_rate: usize = args[1].parse().expect("Couldn't parse arg");
+    let time_unit: usize = args[2].parse().expect("Couldn't parse arg");
+    let precision: f64 = args[3].parse().expect("Couldn't parse arg");
+    let server_address = &args[4];
+
+    let mut client =
+        MessengerClient::connect(server_address.parse::<Uri>().expect("That's not uri"))
+            .await
+            .expect("Couldn't connect");
     let (tx_server, rx) = mpsc::unbounded_channel();
 
     let out_stream = wrappers::UnboundedReceiverStream::new(rx);
@@ -126,7 +145,15 @@ pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut terminal = start_terminal(std::io::stdout())?;
 
-    run_app(&mut terminal, tx_server, rx_server).await?;
+    run_app(
+        &mut terminal,
+        tx_server,
+        rx_server,
+        tick_rate,
+        time_unit,
+        precision,
+    )
+    .await?;
 
     Ok(())
 }
@@ -135,6 +162,9 @@ async fn run_app<B: Backend>(
     terminal: &mut Terminal<B>,
     to_server: UnboundedSender<Signal>,
     mut from_server: Streaming<Signal>,
+    tick_rate: usize,
+    time_unit: usize,
+    precision: f64,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut reader = EventStream::new();
     let (tx_r, mut rx_r) = mpsc::unbounded_channel();
@@ -148,7 +178,15 @@ async fn run_app<B: Backend>(
 
     let (_stream, _stream_handle, sink) = setup_sink();
 
-    let mut app = AppState::new(50, 100, 0.25, tx_s, to_server.clone(), tx_l, rx_server1);
+    let mut app = AppState::new(
+        tick_rate as i32,
+        time_unit as i32,
+        precision,
+        tx_s,
+        to_server.clone(),
+        tx_l,
+        rx_server1,
+    );
 
     tokio::task::spawn_blocking(|| system_signal(tx_r));
     tokio::spawn(ticker(app.tick_rate_d(), tx_t));
