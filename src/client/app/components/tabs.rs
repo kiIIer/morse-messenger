@@ -1,5 +1,4 @@
 use crate::client::app::Mode;
-use std::any::Any;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};

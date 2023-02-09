@@ -3,14 +3,13 @@ use crate::client::app::components::home::HomeComponent;
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::app::components::tabs::{MenuItem, TabsComponent};
 use crate::client::app::components::trans::TransComponent;
-use crate::client::morse::{convert, Letter, Morse};
+use crate::client::morse::{convert, Letter};
 use crate::morser::Signal;
 use crossterm::event::Event::Key;
 use crossterm::event::KeyCode::Char;
 use crossterm::event::{Event as CEvent, KeyCode, KeyEventKind};
 use std::time::Duration;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use tonic::Streaming;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::Frame;
@@ -82,10 +81,6 @@ impl AppState {
         self.tx_sound.send(state).expect("Couldn't send sound");
     }
 
-    pub fn signal(&self) -> bool {
-        self.signal.signal()
-    }
-
     pub fn count_word(&mut self) {
         self.trans.count_word();
     }
@@ -106,8 +101,6 @@ impl AppState {
         }
     }
 
-    pub async fn send_signal(state: bool) {}
-
     pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
         let fsize = f.size();
 
@@ -124,10 +117,6 @@ impl AppState {
             MenuItem::Cheat => self.cheatsheet.draw(f, chunks_main[1], &self.signal),
             MenuItem::Trans => self.trans.draw(f, chunks_main[1], &self.signal),
         }
-    }
-
-    pub fn tick_rate(&self) -> i32 {
-        self.tick_rate
     }
 
     pub fn tick_rate_d(&self) -> Duration {
@@ -189,15 +178,8 @@ impl AppState {
     pub fn should_quit(&self) -> bool {
         self.should_quit
     }
-
-    pub fn tx_server(&self) -> &UnboundedSender<Signal> {
-        &self.tx_server
-    }
     pub fn rx_server(&mut self) -> &mut UnboundedReceiver<Signal> {
         &mut self.rx_server
-    }
-    pub fn time_unit(&self) -> i32 {
-        self.time_unit
     }
     pub fn time_unit_d(&self) -> Duration {
         Duration::from_millis(self.time_unit as u64)

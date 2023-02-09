@@ -1,12 +1,9 @@
 use crate::morser::Signal;
 use futures::FutureExt;
-use futures_core::Stream;
 use futures_timer::Delay;
 use std::time::{Duration, Instant};
 use tokio::select;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
-use tokio_stream::StreamExt;
-use tonic::Streaming;
 use Morse::{Dah, Dit, Space};
 
 #[derive(Debug, PartialEq)]

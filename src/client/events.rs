@@ -8,7 +8,6 @@ use std::time::Duration;
 use tokio::select;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio_stream::StreamExt;
-use tonic::Streaming;
 
 #[derive(Debug)]
 pub enum AppEvent {

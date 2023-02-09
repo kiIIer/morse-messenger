@@ -1,6 +1,5 @@
 use crate::client::app::components::signal::SignalComponent;
 use crate::client::morse::Letter;
-use tokio_stream::StreamExt;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Style};
