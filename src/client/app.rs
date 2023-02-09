@@ -7,7 +7,7 @@ use crate::client::morse::{convert, Letter, Morse};
 use crate::morser::Signal;
 use crossterm::event::Event::Key;
 use crossterm::event::KeyCode::Char;
-use crossterm::event::{Event as CEvent, KeyCode};
+use crossterm::event::{Event as CEvent, KeyCode, KeyEventKind};
 use std::time::Duration;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tonic::Streaming;
@@ -144,18 +144,21 @@ impl AppState {
 
     pub fn handle_c_event(&mut self, event: CEvent) {
         match self.mode {
-            Mode::Normal => match event {
-                Key(key) => match key.code {
-                    Char('q') => self.should_quit = true,
-                    Char('e') => self.mode = Mode::Input,
-                    Char('0') => self.active_tab = MenuItem::Home,
-                    Char('1') => self.active_tab = MenuItem::Signal,
-                    Char('2') => self.active_tab = MenuItem::Cheat,
-                    Char('3') => self.active_tab = MenuItem::Trans,
-                    _ => {}
-                },
-                _ => {}
-            },
+            Mode::Normal => {
+                if let Key(key) = event {
+                    if key.kind == KeyEventKind::Press {
+                        match key.code {
+                            Char('q') => self.should_quit = true,
+                            Char('e') => self.mode = Mode::Input,
+                            Char('0') => self.active_tab = MenuItem::Home,
+                            Char('1') => self.active_tab = MenuItem::Signal,
+                            Char('2') => self.active_tab = MenuItem::Cheat,
+                            Char('3') => self.active_tab = MenuItem::Trans,
+                            _ => {}
+                        }
+                    }
+                }
+            }
 
             Mode::Input => match event {
                 Key(key) => match key.code {
