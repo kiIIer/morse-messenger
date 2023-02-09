@@ -3,6 +3,7 @@ use futures::FutureExt;
 use futures_core::Stream;
 use futures_timer::Delay;
 use std::time::{Duration, Instant};
+use tokio::select;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_stream::StreamExt;
 use tonic::Streaming;
@@ -394,8 +395,18 @@ async fn morse_receiver(
     tokio::spawn(signal_receiver(signal_in, tx_s));
 
     let mut last = (false, Instant::now());
-    while let Some(state) = rx_s.recv().await {
-        let duration = last.1.elapsed();
+    loop {
+        let delay = Delay::new(time_unit * 7).fuse();
+
+        select! {
+            _ = delay => {
+                tx_morse.send(MorseSignal::Off(MorseDelay::Word)).expect("Will not fail");
+            }
+
+            state = rx_s.recv() => {
+                if let Some(state) = state{
+
+                       let duration = last.1.elapsed();
         let current = state.0;
         let now = state.1;
 
@@ -456,6 +467,10 @@ async fn morse_receiver(
         }
 
         tx_morse.send(MorseSignal::On(Morse::None)).expect("Idk");
+
+                }
+            }
+        }
     }
 }
 
@@ -475,6 +490,9 @@ pub async fn letter_receiver(
             MorseSignal::Off(delay) => match delay {
                 MorseDelay::Letter => {}
                 MorseDelay::Word => {
+                    if buffer.is_empty() {
+                        continue;
+                    }
                     let try_letter: Vec<Morse> = buffer.drain(0..buffer.len()).collect();
                     let letter = Letter::from(try_letter);
                     tx_l.send(letter).expect("Couldn't send letter");
